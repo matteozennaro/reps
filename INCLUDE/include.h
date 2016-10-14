@@ -17,12 +17,16 @@ extern double lin_interp_between(double x, double x0, double x1, double y0, doub
 extern void read_parameter_file(char parfile[]);
 
 /**   RUNGE-KUTTA SOLVER ******************************************************/
-extern void RK (int k_num, double *k, double *BETAB, double *BETANU, double *FB, double *FC, double *FN);
+extern void RK (int k_num, double *k,
+      double *BETAB, double *BETANU,
+      double *FB, double *FC, double *FN,
+      double **Delta_b, double **Delta_c, double **Delta_n, double **Delta_m,
+      double **growth_b, double **growth_c, double **growth_n, double **growth_m);
 
-/**   RESCALE PS **************************************************************/
-extern void read_D(char filename[],int n, double *dc, double *dn, double *dm);
-extern void rescale_camb_ps(int knum, double *k);
-extern void rescale_class_ps(int knum, double *k);
+/**   WRITE OUTPUT ************************************************************/
+extern void write_output(int knum, double *k,
+      double **Delta_b,double **Delta_c,double **Delta_n,double **Delta_m,
+      double **growth_b,double **growth_c,double **growth_n,double **growth_m);
 
 /**   BOLTZMANN SOLVER ********************************************************/
 extern void create_boltzmann_ini_file (char dir_chain[]);

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <time.h>
 #include <math.h>
 #include <malloc.h>

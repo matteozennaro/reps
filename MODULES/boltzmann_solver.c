@@ -6,8 +6,8 @@
 #include <malloc.h>
 #include <unistd.h>
 
-#include "include_extern.h"
-extern double ONE2(double A);
+#include "include_global.h"
+#include "background.h"
 
 void create_boltzmann_ini_file (char dir_chain[])
 {
@@ -164,7 +164,7 @@ void create_boltzmann_ini_file (char dir_chain[])
     "transfer_power_var = 7\n"
     "transfer_high_precision = T\n"
     "transfer_kmax = 50\n"
-    "transfer_k_per_logint= 10\n"
+    "transfer_k_per_logint= %i\n"
     "												     \n"
     "transfer_num_redshifts = %i\n"
     "												     \n"
@@ -212,6 +212,7 @@ void create_boltzmann_ini_file (char dir_chain[])
     (int)round(N_degeneracies),
     As,
     ns,
+    k_per_logint_camb,
     znum);
 
     if (mode==0) {

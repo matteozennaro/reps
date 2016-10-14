@@ -14,13 +14,26 @@
 /******************************************************************************/
 /*    DECLARATION OF FUNCTIONS                                                */
 /******************************************************************************/
-#include "include.h"
+#include "neutrino_distribution_function.h"
+#include "read_ini_file.h"
+#include "general_purpose.h"
+#include "RungeKutta_solver.h"
+#include "write_output.h"
+#include "background.h"
 
 /******************************************************************************/
 /*        MAIN                                                                */
 /******************************************************************************/
 int main(int argc, char *argv[])
 {
+  // printf("Welcome in\n");
+  // printf("                               REPS\n");
+  // printf("REscaled Power Spectra for initial conditions with massive neutrinos\n\n");
+
+  frame("Welcome in\n"
+        "                               REPS\n"
+        "REscaled Power Spectra for initial conditions with massive neutrinos\n\n");
+
   read_GG_FF_tabs();
 
   read_parameter_file(argv[1]);
@@ -55,23 +68,22 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  RK(lines,k_requested,beta_b,beta_n,fb_init,fc_init,fn_init);
+  double **Delta_b = allocate_matrix(output_number,lines);
+  double **Delta_c = allocate_matrix(output_number,lines);
+  double **Delta_n = allocate_matrix(output_number,lines);
+  double **Delta_m = allocate_matrix(output_number,lines);
+  double **growth_b = allocate_matrix(output_number,lines);
+  double **growth_c = allocate_matrix(output_number,lines);
+  double **growth_n = allocate_matrix(output_number,lines);
+  double **growth_m = allocate_matrix(output_number,lines);
 
-  if(do_rescaled_ps=='T')
-  {
-    if (strcmp(boltzmann_code,"camb")==0)
-      rescale_camb_ps(lines,k_requested);
-    else if (strcmp(boltzmann_code,"class")==0)
-      rescale_class_ps(lines,k_requested);
-    else
-    {
-      printf("Illegal Boltzmann code selected.\n");
-      printf("The computation of the grwoth rates and factors\n");
-      printf("has been performed, but the rescaling will be skipped.\n");
-    }
-  }
-  else
-    printf("\nRescaling was not requested. Skip.\n");
+  RK(lines,k_requested,beta_b,beta_n,fb_init,fc_init,fn_init,
+     Delta_b,Delta_c,Delta_n,Delta_m,
+     growth_b,growth_c,growth_n,growth_m);
+
+  write_output(lines,k_requested,
+               Delta_b,Delta_c,Delta_n,Delta_m,
+               growth_b,growth_c,growth_n,growth_m);
 
   if(print_hubble=='T')
     print_hubble_table();
@@ -79,6 +91,15 @@ int main(int argc, char *argv[])
     printf("\nPrinting the table of H values was not requested. Skip.\n");
 
 /*Freeing allocated memory*************************************************/
+  deallocate_matrix(Delta_b,output_number,lines);
+  deallocate_matrix(Delta_c,output_number,lines);
+  deallocate_matrix(Delta_n,output_number,lines);
+  deallocate_matrix(Delta_m,output_number,lines);
+  deallocate_matrix(growth_b,output_number,lines);
+  deallocate_matrix(growth_c,output_number,lines);
+  deallocate_matrix(growth_n,output_number,lines);
+  deallocate_matrix(growth_m,output_number,lines);
+
   free(k_requested);
   free(beta_b);
   free(beta_n);
@@ -90,6 +111,6 @@ int main(int argc, char *argv[])
   free(GGtab);
   free(FFtab);
 
-/*Returning null value*****************************************************/
+/* Exit ******************************************************************/
   return 0;
 }

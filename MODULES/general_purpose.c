@@ -1,19 +1,30 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <time.h>
 #include <math.h>
 #include <malloc.h>
 #include <unistd.h>
 
-#include "include_extern.h"
+#include "include_global.h"
+
+void frame(char str[])
+{
+  int add_newline=0;
+  int i=0;
+  while (str[i]!='\0') i++; if(str[i-1]!='\n') add_newline=1;
+  printf("---------------------------------------------------------------------\n");
+  printf("%s",str);
+  if (add_newline==1) printf("\n");
+  printf("---------------------------------------------------------------------\n");
+}
 
 double * allocate_double_vec(int n_elems)
 {
   double *vec = (double*)malloc(n_elems*sizeof(double));
   if (vec==NULL)
   {
-    printf("Bad memory allocation!\n");
+    frame("Bad memory allocation!\n");
     exit(-1);
   }
   else return vec;
@@ -26,7 +37,7 @@ double ** allocate_matrix(int rows, int columns)
   m = malloc(rows*sizeof(double *));
   if (m==NULL)
   {
-    printf("Bad memory allocation!\n");
+    frame("Bad memory allocation!\n");
     exit(-1);
   }
   for(i=0; i<rows; i++)
@@ -34,7 +45,7 @@ double ** allocate_matrix(int rows, int columns)
     m[i] = malloc(columns*sizeof(double));
     if (m==NULL)
     {
-      printf("Bad memory allocation!\n");
+      frame("Bad memory allocation!\n");
       exit(-1);
     }
   }
@@ -58,9 +69,9 @@ void reallocate_matrix(double **m,int rows,int newcols)
   {
     if (realloc(m[i],newcols)==NULL);
     {
-      printf("Some vector reallocation has been attempted\n");
-      printf("but was rejected due to lack of memory.\n");
-      printf("Please, try again with less accuracy.\n");
+      frame("Some vector reallocation has been attempted\n"
+            "but was rejected due to lack of memory.\n"
+            "Please, try again with less accuracy.\n");
       exit(-1);
     }
   }
@@ -70,7 +81,15 @@ int find_z_bin(double Z, double *vec, int n_elems)
 {
   int i = 0;
   if (Z < z_final || Z > z_initial) exit(-1);
-  while (log(1.+Z) > vec[i]) {i++; if(i>n_elems) {printf("Search exceded array dimension\n"); exit(-1);} }
+  while (log(1.+Z) > vec[i])
+  {
+    i++;
+    if(i>n_elems)
+    {
+      frame("Search exceded array dimension\n");
+      exit(-1);
+    }
+  }
   return i;
 }
 
@@ -82,8 +101,8 @@ double det(double **a_in,int n)
 
   if (n < 1)
   {
-    printf("You tried to compute the determinant of \n");
-    printf("a matrix of negative order?\n");
+    frame("You tried to compute the determinant of \n"
+          "a matrix of negative order?\n");
     exit(-1);
   }
   else if (n == 1)
@@ -122,6 +141,24 @@ double det(double **a_in,int n)
   return determinant;
 }
 
+void sort_double_vec(int n_elems, double * vec)
+{
+  double tmp;
+  int i,j;
+  for (i=0;i<n_elems;i++)
+  {
+    for (j=i;j<n_elems;j++)
+    {
+      if (vec[j] < vec[i])
+      {
+        tmp = vec[i];
+        vec[i] = vec[j];
+        vec[j] = tmp;
+      }
+    }
+  }
+}
+
 int count_lines(char file[])
 {
   int l=0;
@@ -130,18 +167,86 @@ int count_lines(char file[])
   if (f!=NULL)
   {
     while(fscanf(f,"%c",&test)!=EOF) if (test=='\n') l++;
+    fclose(f);
   }
   else
   {
-    printf("Problem loading file %s!\n",file);
+    char error[1000];
+    sprintf(error,"Problem loading file %s!\n",file);
+    frame(error);
     exit(-1);
   }
   return l;
 }
 
+int count_header_lines(char file[])
+{
+  int hdl=0;
+  char buf[2000];
+  char * token;
+  FILE *f = fopen(file,"r");
+  if (f!=NULL)
+  {
+    while(!feof(f))
+    {
+      if(fgets(buf,sizeof(buf),f)==NULL) exit(-1);
+      token = strtok(buf," \t");
+      if (token[0]=='#' || token[0]=='/' || token[0]=='!') hdl++;
+      else break;
+    }
+    fclose(f);
+  }
+  else
+  {
+    char error[1000];
+    sprintf(error,"Problem loading file %s!\n",file);
+    frame(error);
+    exit(-1);
+  }
+  return hdl;
+}
+
+int count_number_of_columns(char file[], int number_of_header_lines)
+{
+  int ncol=0;
+  int line=0;
+  char buf[2000];
+  char * token;
+  FILE *f = fopen(file,"r");
+  if (f!=NULL)
+  {
+    while(line<number_of_header_lines)
+    {
+      if(fgets(buf,sizeof(buf),f)==NULL) exit(-1);
+      line++;
+    }
+    if(fgets(buf,sizeof(buf),f)==NULL) exit(-1);
+    token = strtok(buf," \t");
+    if(token!=NULL)
+    {
+      while (token!=NULL)
+      {
+        ncol++;
+        token = strtok(NULL," \t");
+      }
+    }
+    fclose(f);
+  }
+  else
+  {
+    char error[1000];
+    sprintf(error,"Problem loading file %s!\n",file);
+    frame(error);
+    exit(-1);
+  }
+  return ncol;
+}
+
 void fscanf_error(int n)
 {
-  printf("Error reading file. %i values were expected.\n",n);
+  char error[1000];
+  sprintf(error,"Error reading file. %i values were expected.\n",n);
+  frame(error);
   exit(-1);
 }
 

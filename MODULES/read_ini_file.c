@@ -7,285 +7,359 @@
 #include <unistd.h>
 #include <ctype.h>
 
-#include "include_extern.h"
-extern double set_ON0();
-extern int count_lines(char file[]);
+#include "include_global.h"
+#include "background.h"
+#include "general_purpose.h"
 
-void read_parameter_file(char parfile[])
+void read_err(char paramname[])
 {
-  int i,j;
-  int fscanfcheck=0;
-  int Nread = 24;
-  char do_rescaled_ps_str[100];
-  char print_hubble_str[100];
-  char param_names[Nread][100];
+  char error[1000];
+  sprintf(error,"Error! Parameter %s hasn't been specified\n",paramname);
+  frame(error);
+  exit(-1);
+}
 
-  sprintf(param_names[0],"input_file");
-  sprintf(param_names[1],"outputfile");
-  sprintf(param_names[2],"z_initial");
-  sprintf(param_names[3],"z_final");
-  sprintf(param_names[4],"output_number");
-  sprintf(param_names[5],"z_output");
-  sprintf(param_names[6],"h");
-  sprintf(param_names[7],"OB0");
-  sprintf(param_names[8],"OC0");
-  sprintf(param_names[9],"OG0");
-  sprintf(param_names[10],"M_nu");
-  sprintf(param_names[11],"do_rescaled_ps");
-  sprintf(param_names[12],"As");
-  sprintf(param_names[13],"ns");
-  sprintf(param_names[14],"tau_reio");
-  sprintf(param_names[15],"kmax");
-  sprintf(param_names[16],"N_nu");
-  sprintf(param_names[17],"Neff");
-  sprintf(param_names[18],"print_hubble");
-  sprintf(param_names[19],"boltzmann_folder");
-  sprintf(param_names[20],"wrong_nu");
-  sprintf(param_names[21],"boltzmann_code");
-  sprintf(param_names[22],"w0");
-  sprintf(param_names[23],"wa");
-  int check[Nread]; for (i=0; i<Nread; i++) check[i]=0;
-  int check_output_number = 0;
-  char test_str[100];
-  char c;
-
-  FILE *input = fopen(parfile,"r");
-  if (input==NULL)
+int read_double_from_file(char file[], char paramname[], double *val)
+{
+  int reading_success=0;
+  FILE *f = fopen(file,"r");
+  if (f!=NULL)
   {
-    printf("You need to specify a parameter file containing the following (%i) entries:\n",Nread);
-    for(i=0; i<Nread; i++)
-    printf("   %s\n",param_names[i]);
-    exit(1);
-  }
+    char buf[1000];
+    char *token;
 
-  while (!feof(input))
-  {
-    c = getc(input);
-    if (isspace(c)==0)
+    while(!feof(f))
     {
-      if (c!='#')
+      if(fgets(buf,sizeof(buf),f)==NULL) return reading_success;
+      token = strtok(buf," \t=\n");
+      if (token!=NULL)
       {
-        ungetc(c,input);
-        fscanfcheck=fscanf(input,"%s", test_str);
-        for (i = 0; i < Nread; i++)
+        if(token[0]!='#')
         {
-          if (strcmp(test_str,param_names[i]) == 0)
+          while (token!=NULL)
           {
-            if (i==0)
+            if (strcmp(token,paramname)==0)
             {
-              fscanfcheck=fscanf(input,"%s",input_file);
-              check[i] = 1;
+              token = strtok(NULL," \t=\n");
+              *val = atof(token);
+              reading_success = 1;
+              if (verb>0)
+              printf("  %s = %lf\n",paramname,*val);
+              break;
             }
-
-            if (i==1)
+            else
             {
-              fscanfcheck=fscanf(input,"%s",outputfile);
-              check[i] = 1;
-            }
-
-            if (i==2)
-            {
-              fscanfcheck=fscanf(input,"%lf",&z_initial);
-              check[i] = 1;
-            }
-
-            if (i==3)
-            {
-              fscanfcheck=fscanf(input,"%lf",&z_final);
-              check[i] = 1;
-            }
-
-            if (i==4)
-            {
-              fscanfcheck=fscanf(input,"%i",&output_number);
-              if (output_number<=0)
-              {
-                printf("You should specify at least 1 output redshift.\n");
-                exit(1);
-              }
-              else
-              {
-                check_output_number=1;
-                check[i] = 1;
-              }
-            }
-
-            if (i==5)
-            {
-              if (check_output_number==0)
-              {
-                printf("I need you specify the number of required outputs\n");
-                printf("before you tell me the output redshifts.\n");
-                exit(1);
-              }
-              else
-              {
-                z_output = malloc(output_number*sizeof(double));
-                if (z_output==NULL)
-                { printf("Bad memory allocation...\n"); exit(1); }
-                for (j=0; j<output_number; j++)
-                  fscanfcheck=fscanf(input,"%lf",&z_output[j]);
-                check[i] = 1;
-              }
-            }
-
-            if (i==6)
-            {
-              fscanfcheck=fscanf(input,"%lf",&h);
-              check[i] = 1;
-            }
-
-            if (i==7)
-            {
-              fscanfcheck=fscanf(input,"%lf",&OB0);
-              check[i] = 1;
-            }
-
-            if (i==8)
-            {
-             fscanfcheck=fscanf(input,"%lf",&OC0);
-             check[i] = 1;
-            }
-
-            if (i==9)
-            {
-              fscanfcheck=fscanf(input,"%lf",&OG0);
-              OG0/=(h*h);
-              check[i] = 1;
-            }
-
-            if (i==10)
-            {
-              fscanfcheck=fscanf(input,"%lf",&M_nu);
-              check[i] = 1;
-            }
-
-            if (i==11)
-            {
-              fscanfcheck=fscanf(input,"%s",do_rescaled_ps_str);
-              if(strcmp(do_rescaled_ps_str,"T")==0||strcmp(do_rescaled_ps_str,"True")==0||strcmp(do_rescaled_ps_str,"t")==0||strcmp(do_rescaled_ps_str,"true")==0)
-                do_rescaled_ps='T';
-              else if(strcmp(do_rescaled_ps_str,"F")==0||strcmp(do_rescaled_ps_str,"False")==0||strcmp(do_rescaled_ps_str,"f")==0||strcmp(do_rescaled_ps_str,"false")==0)
-                do_rescaled_ps='F';
-              else
-              {
-                printf("\nYou wrote \'do_rescaled_ps %s\'.\n",do_rescaled_ps_str);
-                printf("Please, set \'do_rescaled_ps\' to either\n");
-                printf("T,True,t,true or F,False,f,false. \n\n");
-                exit(1);
-              }
-              check[i] = 1;
-            }
-
-            if (i==12)
-            {
-              fscanfcheck=fscanf(input,"%lf",&As);
-              check[i] = 1;
-            }
-
-            if (i==13)
-            {
-              fscanfcheck=fscanf(input,"%lf",&ns);
-              check[i] = 1;
-            }
-
-            if (i==14)
-            {
-              fscanfcheck=fscanf(input,"%lf",&tau_reio);
-              check[i] = 1;
-            }
-
-            if (i==15)
-            {
-              fscanfcheck=fscanf(input,"%lf",&kmax);
-              check[i] = 1;
-            }
-
-            if (i==16)
-            {
-              fscanfcheck=fscanf(input,"%lf",&N_nu);
-              check[i] = 1;
-            }
-
-            if (i==17)
-            {
-              fscanfcheck=fscanf(input,"%lf",&Neff);
-              check[i] = 1;
-            }
-
-            if (i==18)
-            {
-              fscanfcheck=fscanf(input,"%s",print_hubble_str);
-              if(strcmp(print_hubble_str,"T")==0||strcmp(print_hubble_str,"True")==0||strcmp(print_hubble_str,"t")==0||strcmp(print_hubble_str,"true")==0)
-                print_hubble='T';
-              else if(strcmp(print_hubble_str,"F")==0||strcmp(print_hubble_str,"False")==0||strcmp(print_hubble_str,"f")==0||strcmp(print_hubble_str,"false")==0)
-                print_hubble='F';
-              else
-              {
-                printf("\nYou wrote \'print_hubble %s\'.\n",print_hubble_str);
-                printf("Please, set \'print_hubble\' to either\n");
-                printf("T,True,t,true or F,False,f,false. \n\n");
-                exit(1);
-              }
-              check[i] = 1;
-            }
-
-            if (i==19)
-            {
-              fscanfcheck=fscanf(input,"%s",boltzmann_folder);
-              check[i] = 1;
-            }
-
-            if (i==20)
-            {
-              fscanfcheck=fscanf(input,"%i",&wrong_nu);
-              if (wrong_nu!=0 && wrong_nu!=1 && wrong_nu!=2)
-              {
-                printf("Invalid value of parameter wrong_nu.\n");
-                printf("Please, choose among:\n");
-                printf("  0] Correct solution\n");
-                printf("  1] case05 - rel neutrinos only in background\n");
-                printf("  2] case45 - no rel neutrinos\n");
-              }
-              check[i] = 1;
-            }
-
-            if (i==21)
-            {
-              fscanfcheck=fscanf(input,"%s",boltzmann_code);
-              check[i] = 1;
-            }
-
-            if (i==22)
-            {
-              fscanfcheck=fscanf(input,"%lf",&w0);
-              check[i] = 1;
-            }
-
-            if (i==23)
-            {
-              fscanfcheck=fscanf(input,"%lf",&wa);
-              check[i] = 1;
+              token = strtok(NULL," \t=\n");
             }
           }
         }
       }
-      else while(c!='\n') c = getc(input);
+      if (reading_success==1) break;
     }
+    fclose(f);
   }
-  fclose(input);
-
-  for(i=0; i<Nread; i++)
+  else
   {
-    if (check[i]==0)
+    char error[2000];
+    sprintf(error,"Error! Unable to open param file %s\n"
+          "Make sure you have specified a valid param file\n",file);
+    frame(error);
+    exit(-1);
+  }
+  return reading_success;
+}
+
+int read_int_from_file(char file[], char paramname[], int *val)
+{
+  int reading_success=0;
+  FILE *f = fopen(file,"r");
+  if (f!=NULL)
+  {
+    char buf[1000];
+    char *token;
+
+    while(!feof(f))
     {
-      printf("You didn't specify a value for %s.\n",param_names[i]);
-      exit(1);
+      if(fgets(buf,sizeof(buf),f)==NULL) return reading_success;
+      token = strtok(buf," \t=\n");
+      if (token!=NULL)
+      {
+        if(token[0]!='#')
+        {
+          while (token!=NULL)
+          {
+            if (strcmp(token,paramname)==0)
+            {
+              token = strtok(NULL," \t=\n");
+              *val = atoi(token);
+              reading_success = 1;
+              if (verb>0)
+              printf("  %s = %i\n",paramname,*val);
+              break;
+            }
+            else
+            {
+              token = strtok(NULL," \t=\n");
+            }
+          }
+        }
+      }
+      if (reading_success==1) break;
+    }
+    fclose(f);
+  }
+  else
+  {
+    char error[2000];
+    sprintf(error,"Error! Unable to open param file %s\n"
+          "Make sure you have specified a valid param file\n",file);
+    frame(error);
+    exit(-1);
+  }
+  return reading_success;
+}
+
+int read_bool_from_file(char file[], char paramname[], char *truth)
+{
+  int reading_success=0;
+  FILE *f = fopen(file,"r");
+  if (f!=NULL)
+  {
+    char buf[1000];
+    char *token;
+
+    while(!feof(f))
+    {
+      if(fgets(buf,sizeof(buf),f)==NULL) return reading_success;
+      token = strtok(buf," \t=\n");
+      if (token!=NULL)
+      {
+        if(token[0]!='#')
+        {
+          while (token!=NULL)
+          {
+            if (strcmp(token,paramname)==0)
+            {
+              token = strtok(NULL," \t=\n");
+              if (token[0]=='T' || token[0]=='t')
+                *truth = 'T';
+              else
+                *truth = 'F';
+              if (verb>0)
+              printf("  %s = %c\n",paramname,*truth);
+              reading_success = 1;
+              break;
+            }
+            else
+            {
+              token = strtok(NULL," \t=\n");
+            }
+          }
+        }
+      }
+      if (reading_success==1) break;
+    }
+    fclose(f);
+  }
+  else
+  {
+    char error[2000];
+    sprintf(error,"Error! Unable to open param file %s\n"
+          "Make sure you have specified a valid param file\n",file);
+    frame(error);
+    exit(-1);
+  }
+  return reading_success;
+}
+
+int read_string_from_file(char file[], char paramname[], char *str)
+{
+  int reading_success=0;
+  FILE *f = fopen(file,"r");
+  if (f!=NULL)
+  {
+    char buf[1000];
+    char *token;
+
+    while(!feof(f))
+    {
+      if(fgets(buf,sizeof(buf),f)==NULL) return reading_success;
+      token = strtok(buf," \t=\n");
+      if (token!=NULL)
+      {
+        if(token[0]!='#')
+        {
+          while (token!=NULL)
+          {
+            if (strcmp(token,paramname)==0)
+            {
+              token = strtok(NULL," \t=\n");
+              sprintf(str,"%s",token);
+              reading_success = 1;
+              if (verb>0)
+              printf("  %s = %s\n",paramname,str);
+              break;
+            }
+            else
+            {
+              token = strtok(NULL," \t=\n");
+            }
+          }
+        }
+      }
+      if (reading_success==1) break;
+    }
+    fclose(f);
+  }
+  else
+  {
+    char error[2000];
+    sprintf(error,"Error! Unable to open param file %s\n"
+          "Make sure you have specified a valid param file\n",file);
+    frame(error);
+    exit(-1);
+  }
+  return reading_success;
+}
+
+int read_output_redshifts(char file[])
+{
+  int reading_success = 0;
+  int index_out;
+  double *z_tmp;
+  if(read_int_from_file(file,"output_number",&output_number)!=1)
+  {
+    printf("warning:: Auto-selecting output redshifts\n");
+    output_number=2;
+    z_tmp = allocate_double_vec(2);
+    z_tmp[0]=z_final;
+    z_tmp[1]= z_initial;
+  }
+  else
+  {
+    z_tmp = allocate_double_vec(output_number);
+
+    FILE *f = fopen(file,"r");
+    if (f!=NULL)
+    {
+      char buf[1000];
+      char *token;
+
+      while(!feof(f))
+      {
+        if(fgets(buf,sizeof(buf),f)==NULL) return reading_success;
+        token = strtok(buf," \t=\n");
+        if (token!=NULL)
+        {
+          if(token[0]!='#')
+          {
+            while (token!=NULL)
+            {
+              if (strcmp(token,"z_output")==0)
+              {
+                for (index_out=0; index_out<output_number; index_out++)
+                {
+                  token = strtok(NULL," \t=\n");
+                  z_tmp[index_out] = atof(token);
+                }
+                reading_success = 1;
+                break;
+              }
+              else
+              {
+                token = strtok(NULL," \t=\n");
+              }
+            }
+          }
+        }
+        if (reading_success==1) break;
+      }
+      fclose(f);
+    }
+    else
+    {
+      char error[2000];
+      sprintf(error,"Error! Unable to open param file %s\n"
+            "Make sure you have specified a valid param file\n",file);
+      frame(error);
+      exit(-1);
     }
   }
-  if (fscanfcheck==0) exit(-1);
 
-  //if (wrong_nu==2) Neff = 3.046;
+  sort_double_vec(output_number,z_tmp);
+
+  int add_z_initial = 0;
+  int add_z_final = 0;
+
+  if (z_tmp[output_number-1]!=z_initial)
+  {
+    output_number++;
+    add_z_initial=1;
+  }
+
+  if (z_tmp[0]!=z_final)
+  {
+    output_number++;
+    add_z_final=1;
+  }
+
+  z_output = allocate_double_vec(output_number);
+  for (index_out=0;index_out<(output_number-add_z_initial-add_z_final);index_out++)
+  {
+    z_output[index_out+add_z_final] = z_tmp[index_out];
+  }
+  if (add_z_final==1) z_output[0] = z_final;
+  if (add_z_initial==1) z_output[output_number-1] = z_initial;
+
+  if (verb>0)
+  {
+    printf("  Updated output_number = %i\n",output_number);
+    printf("  Redshifts:\n  ");
+    for(index_out=0;index_out<output_number;index_out++)
+    printf("%.4lf ",z_output[index_out]);
+    printf("\n");
+  }
+
+  free(z_tmp);
+  return reading_success;
+}
+
+void read_parameter_file(char parfile[])
+{
+  if(read_int_from_file(parfile,"verb",&verb)!=1) verb=1;
+
+  if(read_string_from_file(parfile,"input_file",input_file)!=1) read_err("input_file");
+  if(read_string_from_file(parfile,"outputfile",outputfile)!=1) read_err("outputfile");
+  if(read_string_from_file(parfile,"boltzmann_code",boltzmann_code)!=1) read_err("boltzmann_code");
+  if(read_string_from_file(parfile,"boltzmann_folder",boltzmann_folder)!=1) read_err("boltzmann_folder");
+
+  if(read_double_from_file(parfile,"z_initial",&z_initial)!=1) read_err("z_initial");
+  if(read_double_from_file(parfile,"z_final",&z_final)!=1) read_err("z_final");
+  if(read_double_from_file(parfile,"h",&h)!=1) read_err("h");
+  if(read_double_from_file(parfile,"OB0",&OB0)!=1) read_err("OB0");
+  if(read_double_from_file(parfile,"OC0",&OC0)!=1) read_err("OC0");
+  if(read_double_from_file(parfile,"OG0",&OG0)!=1) read_err("OG0");
+  if(read_double_from_file(parfile,"M_nu",&M_nu)!=1) read_err("M_nu");
+  if(read_double_from_file(parfile,"As",&As)!=1) read_err("As");
+  if(read_double_from_file(parfile,"ns",&ns)!=1) read_err("ns");
+  if(read_double_from_file(parfile,"tau_reio",&tau_reio)!=1) read_err("tau_reio");
+  if(read_double_from_file(parfile,"kmax",&kmax)!=1) read_err("kmax");
+  if(read_double_from_file(parfile,"N_nu",&N_nu)!=1) read_err("N_nu");
+  if(read_double_from_file(parfile,"Neff",&Neff)!=1) read_err("Neff");
+  if(read_double_from_file(parfile,"w0",&w0)!=1) read_err("w0");
+  if(read_double_from_file(parfile,"wa",&wa)!=1) read_err("wa");
+
+  if(read_int_from_file(parfile,"k_per_logint_camb",&k_per_logint_camb)!=1)
+  k_per_logint_camb = 10;
+
+  if(read_int_from_file(parfile,"wrong_nu",&wrong_nu)!=1) read_err("wrong_nu");
+
+  if(read_bool_from_file(parfile,"print_hubble",&print_hubble)!=1) read_err("print_hubble");
+
+  read_output_redshifts(parfile);
+
+  OG0/=(h*h);
+
   OR0 = (Neff*(7./8.)*pow(4./11.,4./3.)+1.)*(OG0);
 
   OM0 = OB0+OC0+set_ON0();

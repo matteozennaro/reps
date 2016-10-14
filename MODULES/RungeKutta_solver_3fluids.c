@@ -1,24 +1,15 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <time.h>
 #include <math.h>
 #include <malloc.h>
 #include <unistd.h>
 #include <omp.h>
 
-#include "include_extern.h"
-extern double lin_interp_between(double x, double x0, double x1, double y0, double y1);
-extern double A_func (double A, double OR_rk, double OCB_rk, double OX_rk,
-                      double rk_1_plus_3w, double ON_rk, double E2_rk);
-extern double E2(double A, double ON_CURRENT);
-extern double func_1_3w(double A);
-extern double OCB(double A, double E2);
-extern double ONE2(double A);
-extern double ON(double ON_e2, double E2);
-extern double OR(double A, double E2);
-extern double OX(double A, double E2);
-extern double det(double **a_in,int n);
+#include "include_global.h"
+#include "background.h"
+#include "general_purpose.h"
 
 /********************************************************************/
 /*       DIFFERENTIAL EQUATIONS                                     */
@@ -67,21 +58,15 @@ double Dnprime(double XN)
 /* and procedes through nstep iterations up to z1. It writes the    */
 /* values of k,Dc,Dn,fc,fn,Dm,fm at z=z1 in an output file.         */
 /********************************************************************/
-void RK (int k_num, double *k, double *BETAB, double *BETANU, double *FB, double *FC, double *FN)
+void RK (int k_num, double *k,
+         double *BETAB, double *BETANU,
+         double *FB, double *FC, double *FN,
+         double **Delta_b, double **Delta_c, double **Delta_n, double **Delta_m,
+         double **growth_b, double **growth_c, double **growth_n, double **growth_m)
 {
   int j;
   size_t start = time(NULL);
   size_t stop;
-
-  char out_files[200];
-  FILE *o[output_number];
-
-  int index_out;
-  for (index_out=0; index_out<output_number; index_out++)
-  {
-    sprintf(out_files,"%s_znum%i.txt",outputfile,index_out);
-    o[index_out] = fopen(out_files,"w");
-  }
 
   double Db_k_z[k_num][output_number];
   double Dc_k_z[k_num][output_number];
@@ -92,9 +77,7 @@ void RK (int k_num, double *k, double *BETAB, double *BETANU, double *FB, double
 
   printf("Begin computation! \n");
 
-  // omp_set_num_threads(4);
-
-  #pragma omp parallel for shared(k_num,k,BETAB,BETANU,FB,FC,FN,OM0,OB0,OC0,OX0,OG0,OR0,h,M_nu,tau_reio,ns,As,kmax,N_nu,Neff,wrong_nu,z_final,z_initial,z_output,output_number,bin_beta_in,bin_fc_in,bin_fn_in,bin_out,mode,alpha,Dc_k_z,Dn_k_z,Xc_k_z,Xn_k_z,o) schedule(dynamic)
+  #pragma omp parallel for shared(k_num,k,BETAB,BETANU,FB,FC,FN,OM0,OB0,OC0,OX0,OG0,OR0,h,M_nu,tau_reio,ns,As,kmax,N_nu,Neff,wrong_nu,z_final,z_initial,z_output,output_number,bin_beta_in,bin_fc_in,bin_fn_in,bin_out,mode,alpha,Dc_k_z,Dn_k_z,Xc_k_z,Xn_k_z) schedule(dynamic)
   for (j = 0; j < k_num; j++)
   {
     double step;
@@ -213,8 +196,8 @@ void RK (int k_num, double *k, double *BETAB, double *BETANU, double *FB, double
       for (rk_index_i=0; rk_index_i<4; rk_index_i++)
       {
         xcurrent = x_0 + c_coeff[rk_index_i]*step;
-        a_rk = exp(xcurrent); //1./exp(xcurrent);
-        if (j==10) printf("j = %i, a = %lf\n",j,a_rk);
+        a_rk = exp(xcurrent);
+        // if (j==10) printf("j = %i, a = %lf\n",j,a_rk);
         ON_E2_rk = ONE2(a_rk);
         E2_rk = E2(a_rk,ON_E2_rk);
         OCB_rk = OCB(a_rk,E2_rk);
@@ -313,6 +296,7 @@ void RK (int k_num, double *k, double *BETAB, double *BETANU, double *FB, double
   }
 
   double delta_b,delta_c,delta_n,delta_m,f_m,f_b,f_c,f_n,x_b,x_c,x_n;
+  int index_out;
 
   double a_rk;
   double E2_rk;
@@ -359,18 +343,21 @@ void RK (int k_num, double *k, double *BETAB, double *BETANU, double *FB, double
 
       delta_m = FNU*delta_n+(1.-FNU)*DCB;
       f_b = -x_b/Db_k_z[j][index_out];
-      f_c = -x_c/Dc_k_z[j][index_out];//delta_c;
-      f_n = -x_n/Dn_k_z[j][index_out];//delta_n;
+      f_c = -x_c/Dc_k_z[j][index_out];
+      f_n = -x_n/Dn_k_z[j][index_out];
       f_m = -((1.-FNU)*XCB+FNU*x_n)/((1.-FNU)*DCB+FNU*Dn_k_z[j][index_out]);
 
-      fprintf(o[index_out],
-        "%.12e\t%.12e\t%.12e\t%.12e\t%.12e\t%.12e\t%.12e\t%.12e\t%.12e\n",
-        k[j],delta_b,delta_c,delta_n,delta_m,f_b,f_c,f_n,f_m);
+      Delta_b[index_out][j] = delta_b;
+      Delta_c[index_out][j] = delta_c;
+      Delta_n[index_out][j] = delta_n;
+      Delta_m[index_out][j] = delta_m;
+      growth_b[index_out][j] = f_b;
+      growth_c[index_out][j] = f_c;
+      growth_n[index_out][j] = f_n;
+      growth_m[index_out][j] = f_m;
     }
   }
 
   stop = time(NULL);
   printf("   %.0lf%% completed, end of computation! It took %i s.\n",100.,(int)(stop-start));
-
-  for (index_out=0; index_out<output_number; index_out++) fclose(o[index_out]);
 }

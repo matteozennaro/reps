@@ -29,3 +29,5 @@ extern double G_inf,G_0;
 extern double ytabstep;
 extern int ntab;
 extern double alpha;
+extern int verb;
+extern int k_per_logint_camb;

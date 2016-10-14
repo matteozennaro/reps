@@ -1,14 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <time.h>
 #include <math.h>
 #include <malloc.h>
 #include <unistd.h>
 
-#include "include_extern.h"
-extern double FF(double y);
-extern double GG(double y);
+#include "include_global.h"
+#include "neutrino_distribution_function.h"
 
 /******************************************************************************/
 /*    BACKGROUND                                                              */
@@ -144,7 +143,7 @@ void print_hubble_table()
   int i;
   for (i=0; i<z_nstep; i++)
   {
-    zz = exp(log(1.+z_initial)+i*z_step);
+    zz = exp(log(1.+z_final)+i*z_step);
     e2 = E2(1.0/zz,ONE2(1.0/zz));
 
     fprintf(hub,"%.10e\t%.10e\n",zz-1.,h*H0*sqrt(e2));

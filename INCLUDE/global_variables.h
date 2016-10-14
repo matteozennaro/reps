@@ -5,6 +5,7 @@ char input_file[200];
 char outputfile[200];
 char boltzmann_code[200];
 char boltzmann_folder[500];
+int k_per_logint_camb;
 
 int wrong_nu = 0;
 char do_rescaled_ps;
@@ -45,3 +46,5 @@ int ntab;
 //growth factor at redshift z0 (which is usually z0=0) is fixed to
 //be 1.
 double alpha = 1.;
+
+int verb = 1;

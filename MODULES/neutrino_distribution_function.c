@@ -1,13 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <time.h>
 #include <math.h>
 #include <malloc.h>
 #include <unistd.h>
 
-#include "include_extern.h"
-extern void fscanf_error(int n);
+#include "include_global.h"
+#include "general_purpose.h"
 
 void read_GG_FF_tabs()
 {
@@ -18,13 +18,13 @@ void read_GG_FF_tabs()
     if (getcwd(dir,sizeof(dir))==NULL)
     {
       printf("\nError retrieving current directory path.\n");
-      exit(1);
+      exit(-1);
     }
     printf("Ooops! A folder named \'tabulated_functions\' was expected to be found\n"
     "here %s\n"
     "and it was expected to contain 1 file named \'FF_GG_func_tab.dat\' but \n"
     "something went wrong.\n",dir);
-    exit(1);
+    exit(-1);
   }
 
   int i; int l=0;
@@ -33,9 +33,9 @@ void read_GG_FF_tabs()
   while(fscanf(gft,"%c",&test)!=EOF) if (test=='\n') l++;
   fseek(gft,0,SEEK_SET);
 
-  ytab = malloc(l*sizeof(double));
-  GGtab = malloc(l*sizeof(double));
-  FFtab = malloc(l*sizeof(double));
+  ytab = allocate_double_vec(l);
+  GGtab = allocate_double_vec(l);
+  FFtab = allocate_double_vec(l);
 
   for (i=0; i<l; i++)
   {

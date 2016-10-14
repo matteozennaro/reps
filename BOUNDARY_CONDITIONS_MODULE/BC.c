@@ -14,7 +14,12 @@
 /******************************************************************************/
 /*    DECLARATION OF FUNCTIONS                                                */
 /******************************************************************************/
-#include "include.h"
+#include "boltzmann_solver.h"
+#include "general_purpose.h"
+#include "neutrino_distribution_function.h"
+#include "read_ini_file.h"
+#include "background.h"
+
 void which_k (double *wn, int n_k, char filename[]);
 void lsq(double *x,double **y,int znum,int kindex,double *m,double *q);
 void read_ith_pk(double z, int n_k, double *PB, double *PC, double *PN, char psname[], char tname[]);

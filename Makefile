@@ -21,7 +21,7 @@ MODULES=MODULES
 SOURCE=SOURCE
 
 BOUNDARYFILES=$(BOUNDARY)/BC.o
-MODULEFILES=$(MODULES)/background_functions.o $(MODULES)/neutrino_distribution_function.o $(MODULES)/RungeKutta_solver_3fluids.o $(MODULES)/boltzmann_solver.o $(MODULES)/read_ini_file.o $(MODULES)/general_purpose.o $(MODULES)/rescale_ps.o
+MODULEFILES=$(MODULES)/background_functions.o $(MODULES)/neutrino_distribution_function.o $(MODULES)/RungeKutta_solver_3fluids.o $(MODULES)/boltzmann_solver.o $(MODULES)/read_ini_file.o $(MODULES)/general_purpose.o $(MODULES)/write_output.o
 SOURCEFILE=$(SOURCE)/reps.o
 
 all: boundary modules source bc reps
