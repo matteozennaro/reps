@@ -86,8 +86,8 @@ int main(int argc, char *argv[])
   printf("Generating the boundary conditions...\n");
 
   int bc_nstep=50;
-  double zmin = z_initial-2.; //99-2
-  double zmax = z_initial+2.; //99+2
+  double zmin = z_initial-2.;
+  double zmax = z_initial+2.;
   double xmin = log(1.+zmin);
   double xmax = log(1.+zmax);
   double bc_zz[50];
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
   char dir_chain[1000];
   if (getcwd(dir_chain,sizeof(dir_chain))==NULL)
   {
-    printf("\nError retrieving current directory path.\n");
+    frame("Error retrieving current directory path.\n");
     exit(-1);
   }
 
@@ -122,8 +122,8 @@ int main(int argc, char *argv[])
   sprintf(powfile,"BOUNDARY_CONDITIONS_MODULE/tabs/power_z1_pk.dat");
 
   int knum = count_lines(powfile);
-
-  if (strcmp(boltzmann_code,"camb")==0) knum--;
+  int header_lines = count_header_lines(powfile);
+  knum -= header_lines;
 
   double **Pb,**Pc,**Pn,*k;
   Pb = allocate_matrix(bc_nstep,knum);
@@ -255,12 +255,25 @@ void which_k (double *wn, int n_k, char filename[])
   int fscanfcheck=0;
   char buf[5000];
   char *dummy;
+  int header_lines = count_header_lines(filename);
+  int ncol = count_number_of_columns(filename,header_lines);
+  if (ncol!=2)
+  {
+    char error[2000];
+    sprintf(error,"Error! The power spectrum file is expected to contain\n"
+           "two columns: k [h Mpc^{-1}] and P(k) [h^{-3} Mpc^3]\n"
+           "while %i columns were detected\n",ncol);
+    frame(error);
+    exit(-1);
+  }
+  int hdl=0;
 
   FILE *f = fopen(filename,"r");
-  if (strcmp(boltzmann_code,"camb")==0)
+  while(hdl<header_lines)
   {
     dummy=fgets (buf, sizeof(buf), f);
     if (dummy==NULL) exit(-1);
+    hdl++;
   }
 
   for (i=0; i<n_k; i++)
@@ -268,7 +281,6 @@ void which_k (double *wn, int n_k, char filename[])
     fscanfcheck=fscanf(f,"%lf %lf",&wn[i],&val);
     if (fscanfcheck!=2) fscanf_error(2);
   }
-
   fclose(f);
 }
 
@@ -309,9 +321,16 @@ void num_deriv(int lines, double *FB, double *FC, double *FN, double *Pbminus, d
 void read_ith_pk(double z, int n_k, double *PB, double *PC, double *PN, char psname[], char tname[])
 {
   int fscanfcheck=0;
+  int ncol = count_number_of_columns(tname,count_header_lines(tname));
 
   FILE *ft = fopen(tname,"r");
-  if (ft == NULL) {printf("Problem opening file %s!\n",tname); exit(-1);}
+  if (ft == NULL)
+  {
+    char error[1000];
+    sprintf(error,"Problem opening file %s!\n",tname);
+    frame(error);
+    exit(-1);
+  }
 
   int i; double val;
   double Tc[n_k];
@@ -327,22 +346,22 @@ void read_ith_pk(double z, int n_k, double *PB, double *PC, double *PN, char psn
 
   if (strcmp(boltzmann_code,"camb")==0)
   {
-    if (N_nu!=0)
+    if (ncol!=13)
     {
-      for(i = 0; i < n_k; i++)
-      {
-        fscanfcheck=fscanf(ft,"%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",&k[i],&Tc[i],&Tb[i],&val,&val,&Tn[i],&val,&val,&val,&val,&val,&val,&val);
-        if (fscanfcheck!=13) fscanf_error(13);
-      }
+      char error[1000];
+      sprintf(error,"Error! In the transfer function file there are\n"
+             "%i columns, while 13 were expected.\n"
+             "Please, check this before continuing.\n",ncol);
+      frame(error);
+      exit(-1);
     }
-    else
+    for(i = 0; i < n_k; i++)
     {
-      for(i = 0; i < n_k; i++)
-      {
-        fscanfcheck=fscanf(ft,"%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",&k[i],&Tc[i],&Tb[i],&val,&val,&Tn[i],&val,&val,&val,&val,&val,&val,&val);
-        if (fscanfcheck!=13) fscanf_error(13);
-      }
+      fscanfcheck=fscanf(ft,"%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+      &k[i],&Tc[i],&Tb[i],&val,&val,&Tn[i],&val,&val,&val,&val,&val,&val,&val);
+      if (fscanfcheck!=13) fscanf_error(13);
     }
+
     double kpivot=0.05;
     for (i=0; i < n_k; i++)
     {
@@ -355,6 +374,15 @@ void read_ith_pk(double z, int n_k, double *PB, double *PC, double *PN, char psn
   {
     if (N_nu==0)
     {
+      if (ncol!=6)
+      {
+        char error[1000];
+        sprintf(error,"Error! In the transfer function file there are\n"
+               "%i columns, while 6 were expected.\n"
+               "Please, check this before continuing.\n",ncol);
+        frame(error);
+        exit(-1);
+      }
       for(i = 0; i < n_k; i++)
       {
         fscanfcheck=fscanf(ft,"%lf %lf %lf %lf %lf %lf",&k[i],&val,&Tb[i],&Tc[i],&val,&val);
@@ -363,6 +391,15 @@ void read_ith_pk(double z, int n_k, double *PB, double *PC, double *PN, char psn
     }
     else
     {
+      if (ncol!=9)
+      {
+        char error[1000];
+        sprintf(error,"Error! In the transfer function file there are\n"
+               "%i columns, while 9 were expected.\n"
+               "Please, check this before continuing.\n",ncol);
+        frame(error);
+        exit(-1);
+      }
       for(i = 0; i < n_k; i++)
       {
         fscanfcheck=fscanf(ft,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",&k[i],&val,&Tb[i],&Tc[i],&val,&Tn[i],&val,&val,&val);
