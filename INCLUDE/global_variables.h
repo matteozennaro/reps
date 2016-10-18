@@ -8,7 +8,6 @@ char boltzmann_folder[500];
 int k_per_logint_camb;
 
 int wrong_nu = 0;
-char do_rescaled_ps;
 char print_hubble;
 
 double z_initial,z_final;
@@ -16,12 +15,7 @@ double z_initial,z_final;
 double *z_output;
 
 int output_number;
-int bin_beta_in,bin_fc_in,bin_fn_in;
-int bin_out;
 int mode = 0;
-
-double **matrix_M;
-double **matrix_M2;
 
 double H0 = 100.;
 double OM0,OB0,OC0,OX0,OG0,OR0,h,M_nu,tau_reio,ns,As,kmax,N_nu,Neff;
