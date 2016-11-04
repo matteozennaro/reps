@@ -41,19 +41,21 @@ Please, in writing/modifying your parameter file consider these points:
 Neff must be 3.046, while for cosmologies with 1,2 or 3 massive neutrinos
 Neff = 2.0328,1.0196,0.00641 respectively (same convention as in class).
 
-2] You are requested to insert the path to a boltzmann code, either camb or
+2] You can insert the path to a boltzmann code, either camb or
 class. BC will call it to generate the necessary boundary conditions for
 solving the differential equations. reps will call it to generate the z=0
 power spectrum that will then be rescaled.
 
-3] Output redshifts are requested as
-output_number  2
-z_output 0.0 10.0 50.0 99.0
-with no commas.
+NB: For generating boundary conditions with BC the boltzmann code is compulsory.
+On the contrary, if you provide reps with boundary conditions and with a z=0
+power spectrum, you can skip specifying a Boltzmann code.
 
-4] At the moment you cannot choose different redshifts for z_beta_in, z_fc_in,
-and z_fn_in and they all must coincide with the last entry of the line
-z_output. This limitation will be fixed asap.
+3] Output redshifts are requested in this fashion:
+output_number = 4
+z_output = 0.0 10.0 50.0 99.0
+with no commas between the redshift values.
+
+4] You can choose among different output formats
 
 The code can be used for different purposes.
 FOR SETTING INITIAL CONDITIONS FOR NEWTONIAN SIMULATIONS you need to set
@@ -80,7 +82,7 @@ Usage of reps
 *******************************************************************************
 ./reps params.ini
 The rescaled power spectra will be saved in the folder PK_TABS with names
-beginning with Pcb_ , Pnu_ and Pm_ .
+based on your chosen outputfile, outputfile_Pcb_ , _Pnu_ and _Pm_ .
 
 WARNING ON THE TOTAL MATTER POWER SPECTRUM:
 The code uses internally the definition for the neutrino fraction f_nu adopted
