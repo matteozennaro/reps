@@ -3,6 +3,7 @@
 /******************************************************************************/
 char input_file[200];
 char outputfile[200];
+char output_format[200];
 char boltzmann_code[200];
 char boltzmann_folder[500];
 int k_per_logint_camb;
@@ -18,7 +19,7 @@ int output_number;
 int mode = 0;
 
 double H0 = 100.;
-double OM0,OB0,OC0,OX0,OG0,OR0,h,M_nu,tau_reio,ns,As,kmax,N_nu,Neff;
+double OM0,OB0,OC0,OX0,OG0,OR0,h,M_nu,tau_reio,ns,As,kmax,N_nu,Neff,kpivot;
 double w0,wa;
 
 double Tcmb_0 = 2.7255;      //K
@@ -42,3 +43,6 @@ int ntab;
 double alpha = 1.;
 
 int verb = 1;
+
+char compute_Pk_0;
+char file_Pk_0_in[200];

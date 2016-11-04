@@ -362,7 +362,6 @@ void read_ith_pk(double z, int n_k, double *PB, double *PC, double *PN, char psn
       if (fscanfcheck!=13) fscanf_error(13);
     }
 
-    double kpivot=0.05;
     for (i=0; i < n_k; i++)
     {
       PB[i] = As*pow((k[i]*h)/(kpivot),ns-1.)*(2.0*M_PI*M_PI*k[i]*(h*h*h*h))*(Tb[i]*Tb[i]);
@@ -405,7 +404,6 @@ void read_ith_pk(double z, int n_k, double *PB, double *PC, double *PN, char psn
         fscanfcheck=fscanf(ft,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",&k[i],&val,&Tb[i],&Tc[i],&val,&Tn[i],&val,&val,&val);
       }
     }
-    double kpivot=0.05;
     for (i=0; i < n_k; i++)
     {
       PB[i] = As*pow((k[i]*h)/(kpivot),ns-1.)*(2.0*M_PI*M_PI/(k[i]*k[i]*k[i]))*(Tb[i]*Tb[i]);

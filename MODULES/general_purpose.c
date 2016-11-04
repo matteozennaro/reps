@@ -254,3 +254,25 @@ double lin_interp_between(double x, double x0, double x1, double y0, double y1)
 {
   return y1 + ((y1-y0)/(x1-x0))*(x-x1);
 }
+
+double lin_interp_at(double x0, double *x, double *y, int n)
+{
+  int i=0;
+
+  if (x0 > x[n-1])
+  {
+    i=n-1;
+    return ((y[i]-y[i-1])/(x[i]-x[i-1])*x0 + y[i] - (y[i]-y[i-1])/(x[i]-x[i-1])*x[i]);
+  }
+  else if (x0 < x[0])
+  {
+    i=1;
+    return ((y[i]-y[i-1])/(x[i]-x[i-1])*x0 + y[i] - (y[i]-y[i-1])/(x[i]-x[i-1])*x[i]);
+  }
+  else
+  {
+    while (x0 > x[i]) i++;
+    if (i==0) return y[i];
+    else return ((y[i]-y[i-1])/(x[i]-x[i-1])*x0 + y[i] - (y[i]-y[i-1])/(x[i]-x[i-1])*x[i]);
+  }
+}

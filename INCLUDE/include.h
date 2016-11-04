@@ -12,6 +12,7 @@ extern int find_z_bin(double Z, double *vec, int n_elems);
 extern void reallocate_matrix(double **m,int rows,int newcols);
 extern int count_lines(char file[]);
 extern double lin_interp_between(double x, double x0, double x1, double y0, double y1);
+extern double lin_interp_at(double x0, double *x, double *y, int n);
 
 /**   READ INI FILE ***********************************************************/
 extern void read_parameter_file(char parfile[]);

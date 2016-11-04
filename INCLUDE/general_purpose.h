@@ -12,4 +12,5 @@ extern int count_lines(char file[]);
 extern int count_header_lines(char file[]);
 extern int count_number_of_columns(char file[], int number_of_header_lines);
 extern double lin_interp_between(double x, double x0, double x1, double y0, double y1);
+extern double lin_interp_at(double x0, double *x, double *y, int n);
 /******************************************************************************/

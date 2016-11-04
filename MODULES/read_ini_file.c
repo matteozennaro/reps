@@ -330,6 +330,7 @@ void read_parameter_file(char parfile[])
 
   if(read_string_from_file(parfile,"input_file",input_file)!=1) read_err("input_file");
   if(read_string_from_file(parfile,"outputfile",outputfile)!=1) read_err("outputfile");
+  if(read_string_from_file(parfile,"output_format",output_format)!=1) read_err("output_format");
   if(read_string_from_file(parfile,"boltzmann_code",boltzmann_code)!=1) read_err("boltzmann_code");
   if(read_string_from_file(parfile,"boltzmann_folder",boltzmann_folder)!=1) read_err("boltzmann_folder");
 
@@ -348,6 +349,7 @@ void read_parameter_file(char parfile[])
   if(read_double_from_file(parfile,"Neff",&Neff)!=1) read_err("Neff");
   if(read_double_from_file(parfile,"w0",&w0)!=1) read_err("w0");
   if(read_double_from_file(parfile,"wa",&wa)!=1) read_err("wa");
+  if(read_double_from_file(parfile,"kpivot",&kpivot)!=1) kpivot=0.05;
 
   if(read_int_from_file(parfile,"k_per_logint_camb",&k_per_logint_camb)!=1)
   k_per_logint_camb = 10;
@@ -355,6 +357,14 @@ void read_parameter_file(char parfile[])
   if(read_int_from_file(parfile,"wrong_nu",&wrong_nu)!=1) read_err("wrong_nu");
 
   if(read_bool_from_file(parfile,"print_hubble",&print_hubble)!=1) read_err("print_hubble");
+
+  if (read_bool_from_file(parfile,"compute_Pk_0",&compute_Pk_0)==1)
+  {
+    if(compute_Pk_0=='F')
+    if (read_string_from_file(parfile,"file_Pk_0_in",file_Pk_0_in)!=1)
+    read_err("file_Pk_0_in");
+  }
+  else compute_Pk_0='T';
 
   read_output_redshifts(parfile);
 

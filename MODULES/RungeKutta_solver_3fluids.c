@@ -77,7 +77,7 @@ void RK (int k_num, double *k,
 
   printf("Begin computation! \n");
 
-  #pragma omp parallel for shared(k_num,k,BETAB,BETANU,FB,FC,FN,OM0,OB0,OC0,OX0,OG0,OR0,h,M_nu,tau_reio,ns,As,kmax,N_nu,Neff,wrong_nu,z_final,z_initial,z_output,output_number,bin_beta_in,bin_fc_in,bin_fn_in,bin_out,mode,alpha,Dc_k_z,Dn_k_z,Xc_k_z,Xn_k_z) schedule(dynamic)
+  #pragma omp parallel for shared(k_num,k,BETAB,BETANU,FB,FC,FN,OM0,OB0,OC0,OX0,OG0,OR0,h,M_nu,tau_reio,ns,As,kmax,N_nu,Neff,wrong_nu,z_final,z_initial,z_output,output_number,mode,alpha,Dc_k_z,Dn_k_z,Xc_k_z,Xn_k_z) schedule(dynamic)
   for (j = 0; j < k_num; j++)
   {
     double step;
@@ -316,7 +316,8 @@ void RK (int k_num, double *k,
     OCB_rk = OCB(a_rk,E2_rk);
     ON_rk = ON(ON_E2_rk,E2_rk);
     rk_1_3w = func_1_3w(a_rk);
-    FNU = rk_1_3w*ON_rk/(OCB_rk+rk_1_3w*ON_rk);
+    if (strcmp(boltzmann_code,"camb")==0) FNU = ON_rk/(OCB_rk+ON_rk);
+    else FNU = rk_1_3w*ON_rk/(OCB_rk+rk_1_3w*ON_rk);
 
     DCB = (OB0/(OB0+OC0))*Db_k_z[j][0] + (OC0/(OB0+OC0))*Dc_k_z[j][0];
     normalization = 1./((1.-FNU)*DCB + FNU*Dn_k_z[j][0]);
@@ -336,7 +337,8 @@ void RK (int k_num, double *k,
       OCB_rk = OCB(a_rk,E2_rk);
       ON_rk = ON(ON_E2_rk,E2_rk);
       rk_1_3w = func_1_3w(a_rk);
-      FNU = rk_1_3w*ON_rk/(OCB_rk+rk_1_3w*ON_rk);
+      if (strcmp(boltzmann_code,"camb")==0) FNU = ON_rk/(OCB_rk+ON_rk);
+      else FNU = rk_1_3w*ON_rk/(OCB_rk+rk_1_3w*ON_rk);
 
       DCB = (OB0/(OB0+OC0))*delta_b + (OC0/(OB0+OC0))*delta_c;
       XCB = (OB0/(OB0+OC0))*x_b + (OC0/(OB0+OC0))*x_c;
