@@ -315,9 +315,10 @@ void RK (int k_num, double *k,
     E2_rk = E2(a_rk,ON_E2_rk);
     OCB_rk = OCB(a_rk,E2_rk);
     ON_rk = ON(ON_E2_rk,E2_rk);
-    rk_1_3w = func_1_3w(a_rk);
-    if (strcmp(boltzmann_code,"camb")==0) FNU = ON_rk/(OCB_rk+ON_rk);
-    else FNU = rk_1_3w*ON_rk/(OCB_rk+rk_1_3w*ON_rk);
+    // rk_1_3w = func_1_3w(a_rk);
+    // if (strcmp(boltzmann_code,"camb")==0) FNU = ON_rk/(OCB_rk+ON_rk);
+    // else FNU = rk_1_3w*ON_rk/(OCB_rk+rk_1_3w*ON_rk);
+    FNU = ON_rk/(OCB_rk+ON_rk);
 
     DCB = (OB0/(OB0+OC0))*Db_k_z[j][0] + (OC0/(OB0+OC0))*Dc_k_z[j][0];
     normalization = 1./((1.-FNU)*DCB + FNU*Dn_k_z[j][0]);
@@ -337,8 +338,9 @@ void RK (int k_num, double *k,
       OCB_rk = OCB(a_rk,E2_rk);
       ON_rk = ON(ON_E2_rk,E2_rk);
       rk_1_3w = func_1_3w(a_rk);
-      if (strcmp(boltzmann_code,"camb")==0) FNU = ON_rk/(OCB_rk+ON_rk);
-      else FNU = rk_1_3w*ON_rk/(OCB_rk+rk_1_3w*ON_rk);
+      // if (strcmp(boltzmann_code,"camb")==0) FNU = ON_rk/(OCB_rk+ON_rk);
+      // else FNU = rk_1_3w*ON_rk/(OCB_rk+rk_1_3w*ON_rk);
+      FNU = ON_rk/(OCB_rk+ON_rk);
 
       DCB = (OB0/(OB0+OC0))*delta_b + (OC0/(OB0+OC0))*delta_c;
       XCB = (OB0/(OB0+OC0))*x_b + (OC0/(OB0+OC0))*x_c;

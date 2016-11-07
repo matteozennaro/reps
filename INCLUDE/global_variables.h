@@ -1,7 +1,8 @@
 /******************************************************************************/
 /*    INITIAL SETTINGS - GLOBAL VARIABLES                                     */
 /******************************************************************************/
-char input_file[200];
+char use_boundary_conditions_from_file;
+char boundaryconditionsfile[200];
 char outputfile[200];
 char output_format[200];
 char boltzmann_code[200];
@@ -9,6 +10,7 @@ char boltzmann_folder[500];
 int k_per_logint_camb;
 
 int wrong_nu = 0;
+int wrong_ic = 0;
 char print_hubble;
 
 double z_initial,z_final;

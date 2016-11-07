@@ -9,7 +9,7 @@
 /******************************************************************************/
 /*    INITIAL SETTINGS - GLOBAL VARIABLES                                     */
 /******************************************************************************/
-#include "global_variables.h"
+#include "include_global.h"
 
 /******************************************************************************/
 /*    DECLARATION OF FUNCTIONS                                                */
@@ -20,68 +20,37 @@
 #include "read_ini_file.h"
 #include "background.h"
 
+/******************************************************************************/
+/*    TRANSFER DETAILS - depend on the boltzmann code and its version         */
+/******************************************************************************/
+#include "transfer_details.h"
+
 void which_k (double *wn, int n_k, char filename[]);
 void lsq(double *x,double **y,int znum,int kindex,double *m,double *q);
 void read_ith_pk(double z, int n_k, double *PB, double *PC, double *PN, char psname[], char tname[]);
 void num_deriv(int lines, double *FB, double *FC, double *FN, double *Pbminus, double *Pbplus, double *Pcminus, double *Pcplus, double *Pnminus, double *Pnplus, double zminus, double zplus);
 void print_help();
-int wrong_ic = 0;
 
 /******************************************************************************/
-/*        MAIN                                                                */
+/*        Boundary Conditions                                                 */
 /******************************************************************************/
-int main(int argc, char *argv[])
+void BC()
 {
-  if (argc!=3)
-  {
-    if (argc==2)
-    {
-      if (strcmp(argv[1], "-h")==0 || strcmp(argv[1],"--help")==0 ||
-          strcmp(argv[1],"--h")==0 || strcmp(argv[1], "-help")==0 )
-      {
-        print_help();
-        exit(-1);
-      }
-      printf("  Please, choose the kind of boundary conditions\n");
-      printf("  required, between: \n");
-      printf("    0] correct -numeric- from boltzmann code\n");
-      printf("    1] fcb = Omega_m ^ 0.55\n");
-      printf("    2] fnu = Omega_m ^ 0.55\n");
-      printf("    3] fcb and fnu = Omega_m ^ 0.55\n");
-      printf("\n  Your choice: ");
-      scanf("%i",&wrong_ic); printf("\n");
-      if (wrong_ic != 0 &&
-          wrong_ic != 1 &&
-          wrong_ic != 2 &&
-          wrong_ic != 3)
-      {
-        printf("Error! Illegal value!\n");
-        exit(-1);
-      }
-    }
-    else
-    {
-        printf("Error! You should run ./BC --help and read\n");
-        printf("       the help page to have info on the usage of\n");
-        printf("       this code.\n");
-        exit(-1);
-    }
-  }
-  else
-  {
-    wrong_ic = atoi(argv[2]);
-    if (wrong_ic != 0 &&
-        wrong_ic != 1 &&
-        wrong_ic != 2 &&
-        wrong_ic != 3)
-    {
-      printf("Error! Illegal value!\n");
-      exit(-1);
-    }
-  }
 
-  read_GG_FF_tabs();
-  read_parameter_file(argv[1]);
+  // printf("  Please, choose the kind of boundary conditions\n");
+  // printf("  required, between: \n");
+  // printf("    0] correct -numeric- from boltzmann code\n");
+  // printf("    1] fcb = Omega_m ^ 0.55\n");
+  // printf("    2] fnu = Omega_m ^ 0.55\n");
+  // printf("    3] fcb and fnu = Omega_m ^ 0.55\n");
+  if (wrong_ic != 0 &&
+      wrong_ic != 1 &&
+      wrong_ic != 2 &&
+      wrong_ic != 3)
+  {
+    printf("Error! Illegal value!\n");
+    exit(-1);
+  }
 
   printf("Generating the boundary conditions...\n");
 
@@ -187,7 +156,7 @@ int main(int argc, char *argv[])
 
   double A, OM99;
   char outfinal_file[300];
-  sprintf(outfinal_file,"%s",input_file);
+  sprintf(outfinal_file,"%s",boundaryconditionsfile);
   FILE *outfinal = fopen(outfinal_file,"w");
   if (outfinal==NULL)
   {
@@ -235,8 +204,9 @@ int main(int argc, char *argv[])
 
   fclose(outfinal);
 
-  printf("Boundary conditions written in file %s\n",input_file);
+  printf("Boundary conditions written in file %s\n",boundaryconditionsfile);
   system("rm -rf BOUNDARY_CONDITIONS_MODULE/tabs");
+  system("rm -rf BOUNDARY_CONDITIONS_MODULE");
 
   deallocate_matrix(Pb,bc_nstep,knum);
   deallocate_matrix(Pc,bc_nstep,knum);
@@ -245,8 +215,6 @@ int main(int argc, char *argv[])
   deallocate_matrix(fb,bc_nstep-1,knum);
   deallocate_matrix(fc,bc_nstep-1,knum);
   deallocate_matrix(fn,bc_nstep-1,knum);
-
-  return 0;
 }
 
 void which_k (double *wn, int n_k, char filename[])
@@ -320,7 +288,6 @@ void num_deriv(int lines, double *FB, double *FC, double *FN, double *Pbminus, d
 
 void read_ith_pk(double z, int n_k, double *PB, double *PC, double *PN, char psname[], char tname[])
 {
-  int fscanfcheck=0;
   int ncol = count_number_of_columns(tname,count_header_lines(tname));
 
   FILE *ft = fopen(tname,"r");
@@ -332,7 +299,9 @@ void read_ith_pk(double z, int n_k, double *PB, double *PC, double *PN, char psn
     exit(-1);
   }
 
-  int i; double val;
+  int i;
+  int index_read;
+  double val;
   double Tc[n_k];
   double Tb[n_k];
   double Tn[n_k];
@@ -344,22 +313,50 @@ void read_ith_pk(double z, int n_k, double *PB, double *PC, double *PN, char psn
   dummy = fgets(buf, sizeof(buf), ft);
   if (dummy==NULL) exit(-1);
 
+  char error[2000];
+
   if (strcmp(boltzmann_code,"camb")==0)
   {
-    if (ncol!=13)
+    if (ncol!=CAMB_TRANSFER_NCOL)
     {
       char error[1000];
       sprintf(error,"Error! In the transfer function file there are\n"
-             "%i columns, while 13 were expected.\n"
-             "Please, check this before continuing.\n",ncol);
+             "%i columns, while %i were expected.\n"
+             "Please, check this before continuing.\n",ncol,CAMB_TRANSFER_NCOL);
       frame(error);
       exit(-1);
     }
     for(i = 0; i < n_k; i++)
     {
-      fscanfcheck=fscanf(ft,"%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-      &k[i],&Tc[i],&Tb[i],&val,&val,&Tn[i],&val,&val,&val,&val,&val,&val,&val);
-      if (fscanfcheck!=13) fscanf_error(13);
+      for(index_read=0;index_read<CAMB_TRANSFER_NCOL;index_read++)
+      {
+        if(fscanf(ft,"%lf",&val)!=1)
+        {
+          sprintf(error,"Error reading file %s at line %i\n",tname,i);
+          frame(error);
+          exit(-1);
+        }
+        switch (index_read) {
+          case CAMB_TRANSFER_k:
+            k[i] = val;
+            break;
+          case CAMB_TRANSFER_Tb:
+            Tb[i] = val;
+            break;
+          case CAMB_TRANSFER_Tc:
+            Tc[i] = val;
+            break;
+          case CAMB_TRANSFER_Tn:
+            Tn[i] = val;
+            break;
+          // default:
+          //   sprintf(error,"Error! Your transfer function details seem to\n"
+          //   "not correspond to the actual content of the file\n%s\n"
+          //   "You can check them in INCLUDE/transfer_details.h\n",tname);
+          //   frame(error);
+          //   exit(-1);
+        }
+      }
     }
 
     for (i=0; i < n_k; i++)
@@ -373,35 +370,88 @@ void read_ith_pk(double z, int n_k, double *PB, double *PC, double *PN, char psn
   {
     if (N_nu==0)
     {
-      if (ncol!=6)
+      if (ncol!=CLASS_NONU_TRANSFER_NCOL)
       {
         char error[1000];
         sprintf(error,"Error! In the transfer function file there are\n"
-               "%i columns, while 6 were expected.\n"
-               "Please, check this before continuing.\n",ncol);
+               "%i columns, while %i were expected.\n"
+               "Please, check this before continuing.\n",ncol,CLASS_NONU_TRANSFER_NCOL);
         frame(error);
         exit(-1);
       }
       for(i = 0; i < n_k; i++)
       {
-        fscanfcheck=fscanf(ft,"%lf %lf %lf %lf %lf %lf",&k[i],&val,&Tb[i],&Tc[i],&val,&val);
+        for(index_read=0;index_read<CLASS_NONU_TRANSFER_NCOL;index_read++)
+        {
+          if(fscanf(ft,"%lf",&val)!=1)
+          {
+            sprintf(error,"Error reading file %s at line %i\n",tname,i);
+            frame(error);
+            exit(-1);
+          }
+          switch (index_read) {
+            case CLASS_NONU_TRANSFER_k:
+              k[i] = val;
+              break;
+            case CLASS_NONU_TRANSFER_Tb:
+              Tb[i] = val;
+              break;
+            case CLASS_NONU_TRANSFER_Tc:
+              Tc[i] = val;
+              break;
+            // default:
+            //   sprintf(error,"Error! Your transfer function details seem to\n"
+            //   "not correspond to the actual content of the file\n%s\n"
+            //   "You can check them in INCLUDE/transfer_details.h\n",tname);
+            //   frame(error);
+            //   exit(-1);
+          }
+        }
         Tn[i] = 0.0;
       }
     }
     else
     {
-      if (ncol!=9)
+      if (ncol!=CLASS_NU_TRANSFER_NCOL)
       {
         char error[1000];
         sprintf(error,"Error! In the transfer function file there are\n"
-               "%i columns, while 9 were expected.\n"
-               "Please, check this before continuing.\n",ncol);
+               "%i columns, while %i were expected.\n"
+               "Please, check this before continuing.\n",ncol,CLASS_NU_TRANSFER_NCOL);
         frame(error);
         exit(-1);
       }
       for(i = 0; i < n_k; i++)
       {
-        fscanfcheck=fscanf(ft,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",&k[i],&val,&Tb[i],&Tc[i],&val,&Tn[i],&val,&val,&val);
+        for(index_read=0;index_read<CLASS_NU_TRANSFER_NCOL;index_read++)
+        {
+          if(fscanf(ft,"%lf",&val)!=1)
+          {
+            sprintf(error,"Error reading file %s at line %i\n",tname,i);
+            frame(error);
+            exit(-1);
+          }
+          switch (index_read) {
+            case CLASS_NU_TRANSFER_k:
+              k[i] = val;
+              break;
+            case CLASS_NU_TRANSFER_Tb:
+              Tb[i] = val;
+              break;
+            case CLASS_NU_TRANSFER_Tc:
+              Tc[i] = val;
+              break;
+            case CLASS_NU_TRANSFER_Tn:
+              Tn[i] = val;
+              break;
+            // default:
+            //   sprintf(error,"Error! Your transfer function details seem to\n"
+            //   "not correspond to the actual content of the file\n%s\n"
+            //   "You can check them in INCLUDE/transfer_details.h\n",tname);
+            //   frame(error);
+            //   exit(-1);
+          }
+        }
       }
     }
     for (i=0; i < n_k; i++)

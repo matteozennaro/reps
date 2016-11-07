@@ -14,21 +14,17 @@ ADD_HEADERS=-I./INCLUDE
 
 DEBUGFLAG=
 
-BOUNDARY=BOUNDARY_CONDITIONS_MODULE
 MODULES=MODULES
 SOURCE=SOURCE
 
-BOUNDARYFILES=$(BOUNDARY)/BC.o
-MODULEFILES=$(MODULES)/background_functions.o $(MODULES)/neutrino_distribution_function.o $(MODULES)/RungeKutta_solver_3fluids.o $(MODULES)/boltzmann_solver.o $(MODULES)/read_ini_file.o $(MODULES)/general_purpose.o $(MODULES)/write_output.o
+BOUNDARYFILES=$(MODULES)/boundary_conditions.o
+MODULEFILES=$(MODULES)/background_functions.o $(MODULES)/neutrino_distribution_function.o $(MODULES)/RungeKutta_solver_3fluids.o $(MODULES)/boltzmann_solver.o $(MODULES)/read_ini_file.o $(MODULES)/general_purpose.o $(MODULES)/write_output.o $(MODULES)/boundary_conditions.o
 SOURCEFILE=$(SOURCE)/reps.o
 
-all: boundary modules source bc reps
+all: modules source reps
 
 reps: $(SOURCEFILE) $(MODULEFILES)
 	$(CC) -o reps $(SOURCEFILE) $(MODULEFILES) $(CFLAGS) $(OMPFLAGS) $(OFLAGS) $(DEBUGFLAG) $(ADD_HEADERS)
-
-bc: $(BOUNDARYFILES) $(MODULEFILES)
-	$(CC) -o BC $(BOUNDARYFILES) $(MODULEFILES) $(CFLAGS) $(OMPFLAGS) $(OFLAGS) $(DEBUGFLAG) $(ADD_HEADERS)
 
 source: $(SOURCEFILE)
 
@@ -40,17 +36,10 @@ modules: $(MODULEFILES)
 $(MODULEFILES): %.o : %.c
 	$(CC) -c $< -o $@ $(CFLAGS) $(OMPFLAGS) $(OFLAGS) $(DEBUGFLAG) $(ADD_HEADERS)
 
-boundary: $(BOUNDARYFILES)
-
-$(BOUNDARYFILES): %.o : %.c
-	$(CC) -c $< -o $@ $(CFLAGS) $(OMPFLAGS) $(OFLAGS) $(DEBUGFLAG) $(ADD_HEADERS)
-
 debug: DEBUGFLAG=-DDEBUG
 debug: all
 
 clean:
 	rm -rf $(SOURCE)/*.o
 	rm -rf $(MODULES)/*.o
-	rm -rf $(BOUNDARY)/*.o
 	rm reps
-	rm BC

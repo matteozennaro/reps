@@ -328,7 +328,6 @@ void read_parameter_file(char parfile[])
 {
   if(read_int_from_file(parfile,"verb",&verb)!=1) verb=1;
 
-  if(read_string_from_file(parfile,"input_file",input_file)!=1) read_err("input_file");
   if(read_string_from_file(parfile,"outputfile",outputfile)!=1) read_err("outputfile");
   if(read_string_from_file(parfile,"output_format",output_format)!=1) read_err("output_format");
   if(read_string_from_file(parfile,"boltzmann_code",boltzmann_code)!=1) read_err("boltzmann_code");
@@ -355,6 +354,7 @@ void read_parameter_file(char parfile[])
   k_per_logint_camb = 10;
 
   if(read_int_from_file(parfile,"wrong_nu",&wrong_nu)!=1) read_err("wrong_nu");
+  if(read_int_from_file(parfile,"which_bc",&wrong_ic)!=1) wrong_ic=0;
 
   if(read_bool_from_file(parfile,"print_hubble",&print_hubble)!=1) read_err("print_hubble");
 
@@ -365,6 +365,24 @@ void read_parameter_file(char parfile[])
     read_err("file_Pk_0_in");
   }
   else compute_Pk_0='T';
+
+  if (read_bool_from_file(parfile,"use_boundary_conditions_from_file",&use_boundary_conditions_from_file)==1)
+  {
+    if (use_boundary_conditions_from_file=='T')
+    {
+      if(read_string_from_file(parfile,"boundary_conditions_file",boundaryconditionsfile)!=1)
+      read_err("boundary_conditions_file");
+    }
+    else
+    {
+      sprintf(boundaryconditionsfile,"boundary_conditions.dat");
+    }
+  }
+  else
+  {
+    use_boundary_conditions_from_file='F';
+    sprintf(boundaryconditionsfile,"boundary_conditions.dat");
+  }
 
   read_output_redshifts(parfile);
 

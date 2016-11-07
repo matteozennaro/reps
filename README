@@ -1,94 +1,55 @@
 *******************************************************************************
 *******************************************************************************
-                     reps - v. Oct 2016
+                     REPS - v. Nov 2016
 *******************************************************************************
 *******************************************************************************
 Contents of this file:
 --- Installation
 --- Usage:
 ------ Parameter file
------- Usage of BC
 ------ Usage of reps
---- References
 
 *******************************************************************************
 Installation:
 *******************************************************************************
 Just choose among gcc and icc in the Makefile.
-After 'make' two executables will be created:
+After 'make' the executable reps will be created.
 
-1] BC   -> compute boundary conditions for numerical solution
-2] reps -> solves the fluid equations, calls a Boltzmann code to compute
-          the z=0 power spectrum and rescales it to the requested output
-          redshifts
 *******************************************************************************
 Usage:
 *******************************************************************************
 To use this code:
---> prepare a parameter file, modifying one of the examples following the
-    instructions below
---> run the code BC (or provide your own boundary conditions)
+--> prepare a parameter file, based on params.ini
 --> run the code reps
+
 *******************************************************************************
 Parameter file:
 *******************************************************************************
-BC and reps share the same parameter file. Example of parameter files can be
-found in the folder EXAMPLES.
+REPS parameter file is extensively explained in params.ini. Other examples
+can be found in the folder EXAMPLES.
 
-Please, in writing/modifying your parameter file consider these points:
-
-1] For cosmologies with massless neutrinos
-Neff must be 3.046, while for cosmologies with 1,2 or 3 massive neutrinos
-Neff = 2.0328,1.0196,0.00641 respectively (same convention as in class).
-
-2] You can insert the path to a boltzmann code, either camb or
-class. BC will call it to generate the necessary boundary conditions for
-solving the differential equations. reps will call it to generate the z=0
-power spectrum that will then be rescaled.
-
-NB: For generating boundary conditions with BC the boltzmann code is compulsory.
-On the contrary, if you provide reps with boundary conditions and with a z=0
-power spectrum, you can skip specifying a Boltzmann code.
-
-3] Output redshifts are requested in this fashion:
-output_number = 4
-z_output = 0.0 10.0 50.0 99.0
-with no commas between the redshift values.
-
-4] You can choose among different output formats
-
-The code can be used for different purposes.
+Please, always keep in mind that the code can be used for different purposes.
 FOR SETTING INITIAL CONDITIONS FOR NEWTONIAN SIMULATIONS you need to set
 
+wrong_bc = 0 -> growth rates (used as boundary conditions in the code) will
+                be computed as numerical derivatives of the (square roots of
+                the) power spectra.
+
+and choose between
+
 wrong_nu = 1 -> if you are going to provide the simulation with the tabulated
-                Hubble function produced by reps.
-wrong_nu = 2 -> if you are letting your sim compute H(z) and you sim does not
+                Hubble function produced by REPS.
+wrong_nu = 2 -> if you are letting your sim compute H(z) and your sim does not
                 include relativistic neutrinos in the computation of the Hubble
                 function.
-*******************************************************************************
-Usage of BC:
-*******************************************************************************
-./BC params.ini N
-N is a number and can be
-          0] correct -numeric- from boltzmann code
-          1] fcb = Omega_m ^ 0.55
-          2] fnu = Omega_m ^ 0.55
-          3] fcb and fnu = Omega_m ^ 0.55
 
-FOR SETTING INITIAL CONDITIONS FOR NEWTONIAN SIMULATIONS you need to use 0,
-./BC params.ini 0
 *******************************************************************************
-Usage of reps
+Running REPS
 *******************************************************************************
 ./reps params.ini
-The rescaled power spectra will be saved in the folder PK_TABS with names
-based on your chosen outputfile, outputfile_Pcb_ , _Pnu_ and _Pm_ .
+The rescaled power spectra will be saved with names based on your chosen
+output options. Note that, if the code will call a Boltzmann solver, the
+original outputs of the boltzmann code will be stored in the folder PK_TABS
+for reference.
 
-WARNING ON THE TOTAL MATTER POWER SPECTRUM:
-The code uses internally the definition for the neutrino fraction f_nu adopted
-in class (f_nu = Omega_nu_nonrel / (Omega_cb + Omega_nu_nonrel)). If you are
-comparing results with camb, you can not directly compare the total matter
-power spectrum of reps. Instead, you need to combine yourself the CDM+baryon
-power spectrum and the neutrino power spectrum (as shown in the paper) using
-a neutrino fraction defined as in camb, ie f_nu = Omega_nu/(Omega_cb + Omega_nu)
 *******************************************************************************

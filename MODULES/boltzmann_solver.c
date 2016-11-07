@@ -78,6 +78,7 @@ void create_boltzmann_ini_file (char dir_chain[])
       else
       {
         printf("Does the folder BOUNDARY_CONDITIONS_MODULE/tabs exist? Creating...\n");
+        system("mkdir BOUNDARY_CONDITIONS_MODULE");
         system("mkdir BOUNDARY_CONDITIONS_MODULE/tabs");
         out = fopen(fileopen,"w");
         if (out==NULL)
@@ -309,8 +310,8 @@ void create_boltzmann_ini_file (char dir_chain[])
       else
       {
         printf("Does the folder BOUNDARY_CONDITIONS_MODULE/tabs exist? Creating...\n");
-        FILE *foldercreation = popen("mkdir BOUNDARY_CONDITIONS_MODULE/tabs","w");
-        pclose(foldercreation);
+        system("mkdir BOUNDARY_CONDITIONS_MODULE");
+        system("mkdir BOUNDARY_CONDITIONS_MODULE/tabs");
         out = fopen(fileopen,"w");
         if (out==NULL)
         {

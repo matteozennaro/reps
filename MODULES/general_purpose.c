@@ -221,13 +221,13 @@ int count_number_of_columns(char file[], int number_of_header_lines)
       line++;
     }
     if(fgets(buf,sizeof(buf),f)==NULL) exit(-1);
-    token = strtok(buf," \t");
+    token = strtok(buf," \t\n");
     if(token!=NULL)
     {
       while (token!=NULL)
       {
         ncol++;
-        token = strtok(NULL," \t");
+        token = strtok(NULL," \t\n");
       }
     }
     fclose(f);

@@ -14,6 +14,7 @@
 /******************************************************************************/
 /*    DECLARATION OF FUNCTIONS                                                */
 /******************************************************************************/
+#include "boundary_conditions.h"
 #include "neutrino_distribution_function.h"
 #include "read_ini_file.h"
 #include "general_purpose.h"
@@ -38,11 +39,13 @@ int main(int argc, char *argv[])
 
   read_parameter_file(argv[1]);
 
+  if (use_boundary_conditions_from_file=='F') BC();
+
   int lines = 0;
   int j;
   int fscanfcheck;
 
-  lines = count_lines(input_file);
+  lines = count_lines(boundaryconditionsfile);
 
   double *k_requested = allocate_double_vec(lines);
   double *fb_init = allocate_double_vec(lines);
@@ -51,7 +54,7 @@ int main(int argc, char *argv[])
   double *beta_b = allocate_double_vec(lines);
   double *beta_n = allocate_double_vec(lines);
 
-  FILE *fin = fopen(input_file,"r");
+  FILE *fin = fopen(boundaryconditionsfile,"r");
   if (fin!=NULL)
   {
     for (j = 0; j < lines; j++)
@@ -64,7 +67,7 @@ int main(int argc, char *argv[])
   }
   else
   {
-    printf("Error opening file %s\n",input_file);
+    printf("Error opening file %s\n",boundaryconditionsfile);
     exit(1);
   }
 

@@ -1,8 +1,10 @@
-extern char input_file[200];
+extern char use_boundary_conditions_from_file;
+extern char boundaryconditionsfile[200];
 extern char outputfile[200];
 extern char output_format[200];
 extern char boltzmann_code[200];
 extern char boltzmann_folder[500];
+extern int wrong_ic;
 extern int wrong_nu;
 extern char print_hubble;
 extern double step,z_initial,z_final;
