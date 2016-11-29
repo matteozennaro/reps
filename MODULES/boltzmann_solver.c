@@ -60,6 +60,7 @@ void create_boltzmann_ini_file (char dir_chain[])
     }
 
     int i;
+    char command_mkdir[200];
 
     FILE *out = fopen(fileopen,"w");
     if (out == NULL)
@@ -67,7 +68,8 @@ void create_boltzmann_ini_file (char dir_chain[])
       if (mode==0 || mode==3)
       {
         printf("Does the folder PK_TABS exist? Creating...\n");
-        system("mkdir PK_TABS");
+        sprintf(command_mkdir,"mkdir %s/PK_TABS",dir_chain);
+        system(command_mkdir);
         out = fopen(fileopen,"w");
         if (out==NULL)
         {
@@ -78,8 +80,10 @@ void create_boltzmann_ini_file (char dir_chain[])
       else
       {
         printf("Does the folder BOUNDARY_CONDITIONS_MODULE/tabs exist? Creating...\n");
-        system("mkdir BOUNDARY_CONDITIONS_MODULE");
-        system("mkdir BOUNDARY_CONDITIONS_MODULE/tabs");
+        sprintf(command_mkdir,"mkdir %s/BOUNDARY_CONDITIONS_MODULE",dir_chain);
+        system(command_mkdir);
+        sprintf(command_mkdir,"mkdir %s/BOUNDARY_CONDITIONS_MODULE/tabs",dir_chain);
+        system(command_mkdir);
         out = fopen(fileopen,"w");
         if (out==NULL)
         {
@@ -291,6 +295,7 @@ void create_boltzmann_ini_file (char dir_chain[])
     else Nur = 0.00641;
 
     int i;
+    char command_mkdir[200];
 
     FILE *out = fopen(fileopen,"w");
     if (out == NULL)
@@ -298,8 +303,8 @@ void create_boltzmann_ini_file (char dir_chain[])
       if (mode==0 || mode==3)
       {
         printf("Does the folder PK_TABS exist? Creating...\n");
-        FILE *foldercreation = popen("mkdir PK_TABS","w");
-        pclose(foldercreation);
+        sprintf(command_mkdir,"mkdir %s/PK_TABS",dir_chain);
+        system(command_mkdir);
         out = fopen(fileopen,"w");
         if (out==NULL)
         {
@@ -310,8 +315,10 @@ void create_boltzmann_ini_file (char dir_chain[])
       else
       {
         printf("Does the folder BOUNDARY_CONDITIONS_MODULE/tabs exist? Creating...\n");
-        system("mkdir BOUNDARY_CONDITIONS_MODULE");
-        system("mkdir BOUNDARY_CONDITIONS_MODULE/tabs");
+        sprintf(command_mkdir,"mkdir %s/BOUNDARY_CONDITIONS_MODULE",dir_chain);
+        system(command_mkdir);
+        sprintf(command_mkdir,"mkdir %s/BOUNDARY_CONDITIONS_MODULE/tabs",dir_chain);
+        system(command_mkdir);
         out = fopen(fileopen,"w");
         if (out==NULL)
         {
@@ -320,6 +327,7 @@ void create_boltzmann_ini_file (char dir_chain[])
         }
       }
     }
+
     fprintf(out,
     "H0 = %.8lf                      \n"
     "T_cmb = 2.7255                      \n"
