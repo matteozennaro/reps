@@ -35,9 +35,9 @@ int main(int argc, char *argv[])
         "                               REPS\n"
         "REscaled Power Spectra for initial conditions with massive neutrinos\n\n");
 
-  read_GG_FF_tabs();
-
   read_parameter_file(argv[1]);
+  
+  read_GG_FF_tabs();
 
   if (use_boundary_conditions_from_file=='F') BC();
 
