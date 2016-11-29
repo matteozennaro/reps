@@ -351,7 +351,7 @@ void read_parameter_file(char parfile[])
   if(read_double_from_file(parfile,"kpivot",&kpivot)!=1) kpivot=0.05;
 
   if(read_string_from_file(parfile,"neutrino_tabulated_functions",neutrino_tab_file)!=1)
-    sprintf(neutrino_tab_file,"tabulated_functions/FF_GG_func_tab.dat");
+    sprintf(neutrino_tab_file,"%s","tabulated_functions/FF_GG_func_tab.dat");
 
   if(read_int_from_file(parfile,"k_per_logint_camb",&k_per_logint_camb)!=1)
   k_per_logint_camb = 10;
