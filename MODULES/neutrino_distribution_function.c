@@ -11,7 +11,7 @@
 
 void read_GG_FF_tabs()
 {
-  FILE *gft = fopen("tabulated_functions/FF_GG_func_tab.dat","r");
+  FILE *gft = fopen(neutrino_tab_file,"r");
   if (gft==NULL)
   {
     char dir[1000];

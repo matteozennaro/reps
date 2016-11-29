@@ -4,6 +4,7 @@ extern char outputfile[200];
 extern char output_format[200];
 extern char boltzmann_code[200];
 extern char boltzmann_folder[500];
+extern char neutrino_tab_file[200];
 extern int wrong_ic;
 extern int wrong_nu;
 extern char print_hubble;

@@ -302,7 +302,7 @@ void RK (int k_num, double *k,
   double E2_rk;
   double ON_E2_rk;
   double FNU;
-  double rk_1_3w;
+  // double rk_1_3w;
   double OCB_rk;
   double ON_rk;
 
@@ -337,7 +337,7 @@ void RK (int k_num, double *k,
       E2_rk = E2(a_rk,ON_E2_rk);
       OCB_rk = OCB(a_rk,E2_rk);
       ON_rk = ON(ON_E2_rk,E2_rk);
-      rk_1_3w = func_1_3w(a_rk);
+      // rk_1_3w = func_1_3w(a_rk);
       // if (strcmp(boltzmann_code,"camb")==0) FNU = ON_rk/(OCB_rk+ON_rk);
       // else FNU = rk_1_3w*ON_rk/(OCB_rk+rk_1_3w*ON_rk);
       FNU = ON_rk/(OCB_rk+ON_rk);

@@ -28,6 +28,7 @@ double Tcmb_0 = 2.7255;      //K
 double Kb = 8.617342e-5;     //eV K^-1
 double Gamma_nu = 0.71611;   //Tnu0/Tcmb0
 
+char neutrino_tab_file[200];
 double *ytab;
 double *FFtab;
 double *GGtab;
