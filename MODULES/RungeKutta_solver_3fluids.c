@@ -349,7 +349,7 @@ void RK (int k_num, double *k,
       f_b = -x_b/Db_k_z[j][index_out];
       f_c = -x_c/Dc_k_z[j][index_out];
       f_n = -x_n/Dn_k_z[j][index_out];
-      f_m = -((1.-FNU)*XCB+FNU*x_n)/((1.-FNU)*DCB+FNU*Dn_k_z[j][index_out]);
+      f_m = -((1.-FNU)*XCB+FNU*x_n)/((1.-FNU)*((OB0/(OB0+OC0))*Db_k_z[j][index_out]+(OC0/(OB0+OC0))*Dc_k_z[j][index_out])+FNU*Dn_k_z[j][index_out]);
 
       Delta_b[index_out][j] = delta_b;
       Delta_c[index_out][j] = delta_c;
