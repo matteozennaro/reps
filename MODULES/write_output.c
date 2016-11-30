@@ -290,7 +290,7 @@ void print_camblike_transfer(char file[],int knum,double *k,double *Db,
   }
 }
 
-void print_ngenic_transfer(char file[],int knum,double *k,double *Db,
+void print_ngenic_old_transfer(char file[],int knum,double *k,double *Db,
                         double *Dc,double *Dn,double *Dm,double *P0)
 {
   // In this case there are no velocities and transfers are defined
@@ -411,7 +411,7 @@ void print_ngenic_transfer(char file[],int knum,double *k,double *Db,
   }
 }
 
-void print_ngenic_old_transfer(char file[],int knum,double *k,double *Db,
+void print_ngenic_transfer(char file[],int knum,double *k,double *Db,
                                double *Dc,double *Dn,double *Dm,double *P0)
 {
   // In this case there are no velocities and transfers are defined
