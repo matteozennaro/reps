@@ -443,6 +443,12 @@ void print_ngenic_transfer(char file[],int knum,double *k,double *Db,
     Tm[i] = sqrt(Pm[i]/Pm[i]);
   }
 
+  // Avoid to see zeros written as 1.e-20
+  if (M_nu==0.0)
+  {
+    for (i=0;i<knum;i++) Tn[i] = 0.0;
+  }
+
   // IMPORTANT !!!!
   // The following is relative to NGenIC
   // Hopefully, these things don't change too much among different versions
