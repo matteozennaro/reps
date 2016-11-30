@@ -443,7 +443,7 @@ void print_ngenic_transfer(char file[],int knum,double *k,double *Db,
     Tm[i] = sqrt(Pm[i]/Pm[i]);
   }
 
-  // Avoid to see zeros written as 1.e-20
+  // Avoid seeing zeros written as 1.e-20
   if (M_nu==0.0)
   {
     for (i=0;i<knum;i++) Tn[i] = 0.0;
