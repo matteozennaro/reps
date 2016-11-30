@@ -411,6 +411,132 @@ void print_ngenic_transfer(char file[],int knum,double *k,double *Db,
   }
 }
 
+void print_ngenic_old_transfer(char file[],int knum,double *k,double *Db,
+                               double *Dc,double *Dn,double *Dm,double *P0)
+{
+  // In this case there are no velocities and transfers are defined
+  // in another way
+
+  // 1. Create power spectra for each species
+  double Pb[knum];
+  double Pc[knum];
+  double Pn[knum];
+  double Pm[knum];
+  int i;
+  for (i=0;i<knum;i++)
+  {
+    Pb[i] = Db[i]*Db[i]*P0[i];
+    Pc[i] = Dc[i]*Dc[i]*P0[i];
+    Pn[i] = Dn[i]*Dn[i]*P0[i];
+    Pm[i] = Dm[i]*Dm[i]*P0[i];
+  }
+  // 2. Compute camb normalization and use it to compute transfers
+  double Tb[knum];
+  double Tc[knum];
+  double Tn[knum];
+  double Tm[knum];
+  for (i=0;i<knum;i++)
+  {
+    Tb[i] = sqrt(Pb[i]/Pm[i]);
+    Tc[i] = sqrt(Pc[i]/Pm[i]);
+    Tn[i] = sqrt(Pn[i]/Pm[i]);
+    Tm[i] = sqrt(Pm[i]/Pm[i]);
+  }
+
+  // IMPORTANT !!!!
+  // The following is relative to NGenIC
+  // Hopefully, these things don't change too much among different versions
+  // of NGenIC, but SOMETIMES they do.
+  // Please check what your code really wants as an input and, in case,
+  // modify this part accordingly (then 'make clean' and 'make' again).
+  // I hope this is general enough, so it should be simple to adjust to
+  // everyone's needs.
+
+  // Specify the total number of columns you want your file to have
+  // Irrelevant columns will be set to 0
+  int Number_of_columns_in_transfer_file = 7;
+
+  // Now specify in which column you want each output
+  // (Columns are numbered starting from 0)
+  int k_col = 0;
+  int neutrino_transfer_col = 5;
+  int matter_transfer_col = 6;
+  int cdm_transfer_col = 2;
+  int baryon_transfer_col = 1;
+
+  double **OutputTable = allocate_matrix(knum,Number_of_columns_in_transfer_file);
+  int j;
+  for (i=0;i<Number_of_columns_in_transfer_file;i++)
+  {
+    if (i==k_col)
+    {
+      for (j=0;j<knum;j++)
+      {
+        OutputTable[j][i] = k[j];
+      }
+    }
+    else if(i==neutrino_transfer_col)
+    {
+      for (j=0;j<knum;j++)
+      {
+        OutputTable[j][i] = Tn[j];
+      }
+    }
+    else if(i==matter_transfer_col)
+    {
+      for (j=0;j<knum;j++)
+      {
+        OutputTable[j][i] = Tm[j];
+      }
+    }
+    else if(i==cdm_transfer_col)
+    {
+      for (j=0;j<knum;j++)
+      {
+        OutputTable[j][i] = Tc[j];
+      }
+    }
+    else if(i==baryon_transfer_col)
+    {
+      for (j=0;j<knum;j++)
+      {
+        OutputTable[j][i] = Tb[j];
+      }
+    }
+    else
+    {
+      for (j=0;j<knum;j++)
+      {
+        OutputTable[j][i] = 0.0;
+      }
+    }
+  }
+
+  FILE * f = fopen(file,"w");
+  if(f!=NULL)
+  {
+    for (i=0;i<knum;i++)
+    {
+        for (j=0;j<Number_of_columns_in_transfer_file;j++)
+      {
+        fprintf(f,"%.10e\t",OutputTable[i][j]);
+      }
+      fprintf(f,"\n");
+    }
+    fclose(f);
+    if (verb>1) printf("Written file %s\n",file);
+    deallocate_matrix(OutputTable,knum,Number_of_columns_in_transfer_file);
+  }
+  else
+  {
+    char error[2000];
+    sprintf(error,"Error! Creating the file %s\n"
+           "raised a fatal exception\n",file);
+    frame(error);
+    exit(-1);
+  }
+}
+
 void retrieve_Pm_z0(int knum,double *ktrue, double *k, double *P)
 {
   if (compute_Pk_0=='T')
@@ -485,12 +611,12 @@ void write_output(int knum, double *k,
                               growth_m[index_out],Pmz0,z_output[index_out]);
     }
   }
-  else if(strcmp(output_format,"ngenic")==0)
+  else if(strcmp(output_format,"ngenic_old")==0)
   {
     for (index_out=0; index_out<output_number; index_out++)
     {
       sprintf(currentfile,"%s_rescaled_transfer_z%.4lf.txt",outputfile,z_output[index_out]);
-      print_ngenic_transfer(currentfile,knum,k,Delta_b[index_out],Delta_c[index_out],
+      print_ngenic_old_transfer(currentfile,knum,k,Delta_b[index_out],Delta_c[index_out],
                               Delta_n[index_out],Delta_m[index_out],Pmz0);
       sprintf(currentfile,"%s_Pm_rescaled_z%.4lf.txt",outputfile,z_output[index_out]);
       print_power_spectrum(currentfile,knum,k,Delta_m[index_out],Pmz0);
@@ -523,12 +649,65 @@ void write_output(int knum, double *k,
       print_growth_rate(currentfile,knum,k,growth_m[index_out]);
     }
   }
+  else if(strcmp(output_format,"ngenic")==0)
+  {
+    for (index_out=0; index_out<output_number; index_out++)
+    {
+      sprintf(currentfile,"%s_rescaled_transfer_z%.4lf.txt",outputfile,z_output[index_out]);
+      print_ngenic_transfer(currentfile,knum,k,Delta_b[index_out],Delta_c[index_out],
+                              Delta_n[index_out],Delta_m[index_out],Pmz0);
+
+      sprintf(currentfile,"%s_Pm_rescaled_z%.4lf.txt",outputfile,z_output[index_out]);
+      print_power_spectrum(currentfile,knum,k,Delta_m[index_out],Pmz0);
+
+      sprintf(currentfile,"%s_Pb_rescaled_z%.4lf.txt",outputfile,z_output[index_out]);
+      print_power_spectrum(currentfile,knum,k,Delta_b[index_out],Pmz0);
+
+      sprintf(currentfile,"%s_Pc_rescaled_z%.4lf.txt",outputfile,z_output[index_out]);
+      print_power_spectrum(currentfile,knum,k,Delta_c[index_out],Pmz0);
+
+      sprintf(currentfile,"%s_Pn_rescaled_z%.4lf.txt",outputfile,z_output[index_out]);
+      print_power_spectrum(currentfile,knum,k,Delta_n[index_out],Pmz0);
+
+      double Delta_cb[knum];
+      int i;
+      for(i=0;i<knum; i++)
+      Delta_cb[i] = (OB0/(OB0+OC0))*Delta_b[index_out][i] +
+                    (OC0/(OB0+OC0))*Delta_c[index_out][i] ;
+      sprintf(currentfile,"%s_Pcb_rescaled_z%.4lf.txt",outputfile,z_output[index_out]);
+      print_power_spectrum(currentfile,knum,k,Delta_cb,Pmz0);
+
+      sprintf(currentfile,"%s_fb_z%.4lf.txt",outputfile,z_output[index_out]);
+      print_growth_rate(currentfile,knum,k,growth_b[index_out]);
+
+      sprintf(currentfile,"%s_fc_z%.4lf.txt",outputfile,z_output[index_out]);
+      print_growth_rate(currentfile,knum,k,growth_c[index_out]);
+
+      double growth_cb[knum];
+      double Delta_b_Delta_cb,Delta_c_Delta_cb;
+      for(i=0;i<knum; i++)
+      {
+        Delta_b_Delta_cb = Delta_b[index_out][i] / Delta_cb[i];
+        Delta_c_Delta_cb = Delta_c[index_out][i] / Delta_cb[i];
+        growth_cb[i] = Delta_b_Delta_cb*(OB0/(OB0+OC0))*growth_b[index_out][i] +
+                       Delta_c_Delta_cb*(OC0/(OB0+OC0))*growth_c[index_out][i];
+      }
+
+      sprintf(currentfile,"%s_fcb_z%.4lf.txt",outputfile,z_output[index_out]);
+      print_growth_rate(currentfile,knum,k,growth_cb);
+
+      sprintf(currentfile,"%s_fn_z%.4lf.txt",outputfile,z_output[index_out]);
+      print_growth_rate(currentfile,knum,k,growth_n[index_out]);
+
+      sprintf(currentfile,"%s_fm_z%.4lf.txt",outputfile,z_output[index_out]);
+      print_growth_rate(currentfile,knum,k,growth_m[index_out]);
+    }
+  }
   else
   {
     for (index_out=0; index_out<output_number; index_out++)
     {
       int i;
-
       sprintf(currentfile,"%s_Pb_rescaled_z%.4lf.txt",outputfile,z_output[index_out]);
       print_power_spectrum(currentfile,knum,k,Delta_b[index_out],Pmz0);
 
@@ -561,13 +740,11 @@ void write_output(int knum, double *k,
       print_growth_rate(currentfile,knum,k,growth_m[index_out]);
 
       double growth_cb[knum];
-      double Delta_cb,Delta_b_Delta_cb,Delta_c_Delta_cb;
-      int i;
+      double Delta_b_Delta_cb,Delta_c_Delta_cb;
       for(i=0;i<knum; i++)
       {
-        Delta_cb = (OB0/(OB0+OC0))*Delta_b[index_out][i] + (OC0/(OB0+OC0))*Delta_c[index_out][i];
-        Delta_b_Delta_cb = Delta_b[index_out][i] / Delta_cb;
-        Delta_c_Delta_cb = Delta_c[index_out][i] / Delta_cb;
+        Delta_b_Delta_cb = Delta_b[index_out][i] / Delta_cb[i];
+        Delta_c_Delta_cb = Delta_c[index_out][i] / Delta_cb[i];
         growth_cb[i] = Delta_b_Delta_cb*(OB0/(OB0+OC0))*growth_b[index_out][i] +
                        Delta_c_Delta_cb*(OC0/(OB0+OC0))*growth_c[index_out][i];
       }
