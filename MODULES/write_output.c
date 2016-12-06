@@ -627,6 +627,23 @@ void write_output(int knum, double *k,
       sprintf(currentfile,"%s_Pm_rescaled_z%.4lf.txt",outputfile,z_output[index_out]);
       print_power_spectrum(currentfile,knum,k,Delta_m[index_out],Pmz0);
 
+      sprintf(currentfile,"%s_Pb_rescaled_z%.4lf.txt",outputfile,z_output[index_out]);
+      print_power_spectrum(currentfile,knum,k,Delta_b[index_out],Pmz0);
+
+      sprintf(currentfile,"%s_Pc_rescaled_z%.4lf.txt",outputfile,z_output[index_out]);
+      print_power_spectrum(currentfile,knum,k,Delta_c[index_out],Pmz0);
+
+      sprintf(currentfile,"%s_Pn_rescaled_z%.4lf.txt",outputfile,z_output[index_out]);
+      print_power_spectrum(currentfile,knum,k,Delta_n[index_out],Pmz0);
+
+      double Delta_cb[knum];
+      int i;
+      for(i=0;i<knum; i++)
+      Delta_cb[i] = (OB0/(OB0+OC0))*Delta_b[index_out][i] +
+                    (OC0/(OB0+OC0))*Delta_c[index_out][i] ;
+      sprintf(currentfile,"%s_Pcb_rescaled_z%.4lf.txt",outputfile,z_output[index_out]);
+      print_power_spectrum(currentfile,knum,k,Delta_cb,Pmz0);
+
       sprintf(currentfile,"%s_fb_z%.4lf.txt",outputfile,z_output[index_out]);
       print_growth_rate(currentfile,knum,k,growth_b[index_out]);
 
@@ -634,13 +651,11 @@ void write_output(int knum, double *k,
       print_growth_rate(currentfile,knum,k,growth_c[index_out]);
 
       double growth_cb[knum];
-      double Delta_cb,Delta_b_Delta_cb,Delta_c_Delta_cb;
-      int i;
+      double Delta_b_Delta_cb,Delta_c_Delta_cb;
       for(i=0;i<knum; i++)
       {
-        Delta_cb = (OB0/(OB0+OC0))*Delta_b[index_out][i] + (OC0/(OB0+OC0))*Delta_c[index_out][i];
-        Delta_b_Delta_cb = Delta_b[index_out][i] / Delta_cb;
-        Delta_c_Delta_cb = Delta_c[index_out][i] / Delta_cb;
+        Delta_b_Delta_cb = Delta_b[index_out][i] / Delta_cb[i];
+        Delta_c_Delta_cb = Delta_c[index_out][i] / Delta_cb[i];
         growth_cb[i] = Delta_b_Delta_cb*(OB0/(OB0+OC0))*growth_b[index_out][i] +
                        Delta_c_Delta_cb*(OC0/(OB0+OC0))*growth_c[index_out][i];
       }
