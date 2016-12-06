@@ -467,8 +467,8 @@ void print_ngenic_transfer(char file[],int knum,double *k,double *Db,
   int k_col = 0;
   int neutrino_transfer_col = 5;
   int matter_transfer_col = 6;
-  int cdm_transfer_col = 2;
-  int baryon_transfer_col = 1;
+  int cdm_transfer_col = 1;
+  int baryon_transfer_col = 2;
 
   double **OutputTable = allocate_matrix(knum,Number_of_columns_in_transfer_file);
   int j;
