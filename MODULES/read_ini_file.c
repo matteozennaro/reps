@@ -388,13 +388,4 @@ void read_parameter_file(char parfile[])
   }
 
   read_output_redshifts(parfile);
-
-  OG0/=(h*h);
-
-  OR0 = (Neff*(7./8.)*pow(4./11.,4./3.)+1.)*(OG0);
-
-  OM0 = OB0+OC0+set_ON0();
-  OX0 = 1.-OM0-OR0;
-
-  printf("\nDerived parameters: OM0 = %lf, OX0 = %lf\n\n",OM0,OX0);
 }
