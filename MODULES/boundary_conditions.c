@@ -412,18 +412,19 @@ void read_ith_pk(double z, int n_k, double *PB, double *PC, double *PN, char psn
     }
     else
     {
-      if (ncol!=CLASS_NU_TRANSFER_NCOL)
+      if (ncol!=(CLASS_NU_TRANSFER_NCOL-(3-(int)N_nu)))
       {
         char error[1000];
         sprintf(error,"Error! In the transfer function file there are\n"
                "%i columns, while %i were expected.\n"
-               "Please, check this before continuing.\n",ncol,CLASS_NU_TRANSFER_NCOL);
+               "Please, check this before continuing.\n",
+               ncol,CLASS_NU_TRANSFER_NCOL-(3-(int)N_nu));
         frame(error);
         exit(-1);
       }
       for(i = 0; i < n_k; i++)
       {
-        for(index_read=0;index_read<CLASS_NU_TRANSFER_NCOL;index_read++)
+        for(index_read=0;index_read<CLASS_NU_TRANSFER_NCOL-(3-(int)N_nu);index_read++)
         {
           if(fscanf(ft,"%lf",&val)!=1)
           {

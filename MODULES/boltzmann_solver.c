@@ -54,9 +54,9 @@ void create_boltzmann_ini_file (char dir_chain[])
     }
     else
     {
-      Nur = 0.046;
+      Nur = 3.0 - (double)N_nu + 0.046;
       N_eigenstates = 1.0;
-      N_degeneracies = 3.0;
+      N_degeneracies = (double)N_nu;
     }
 
     int i;
@@ -132,6 +132,7 @@ void create_boltzmann_ini_file (char dir_chain[])
     "massive_neutrinos  = %i\n"
     "												     \n"
     "												     \n"
+    "share_delta_neff = F \n"
     "nu_mass_eigenstates = %i\n"
     "nu_mass_degeneracies = %i\n"
     "nu_mass_fractions = 1\n"
@@ -184,7 +185,7 @@ void create_boltzmann_ini_file (char dir_chain[])
     "lens_potential_output_file = lenspotentialCls.dat\n"
     "FITS_filename      = scalCls.fits\n"
     "												     \n"
-    "feedback_level = 0\n"
+    "feedback_level = 1\n"
     "												     \n"
     "lensing_method = 1\n"
     "accurate_BB = F\n"
@@ -292,7 +293,7 @@ void create_boltzmann_ini_file (char dir_chain[])
 
     double Nur;
     if (M_nu==0.) Nur = 3.046;
-    else Nur = 0.00641;
+    else Nur = Neff;
 
     int i;
     char command_mkdir[200];
@@ -336,11 +337,35 @@ void create_boltzmann_ini_file (char dir_chain[])
     "Omega_cdm = %.8lf                     \n"
     "Omega_dcdmdr = 0.0                    \n"
     "Gamma_dcdm = 0.0                    \n"
-    "N_ncdm = %lf                      \n"
-    "m_ncdm = %4lf,%4lf,%4lf                   \n"
+    "N_ncdm = %lf                      \n",
+    h*100.,
+    OB0,
+    Nur,
+    OC0,
+    N_nu);
+
+    fprintf(out,
+    "m_ncdm = %lf",M_nu/N_nu);
+    for(i=1;i<N_nu;i++) fprintf(out,", %lf",M_nu/N_nu);
+    fprintf(out,"\n");
+
+    fprintf(out,
     "Omega_ncdm =                        \n"
-    "T_ncdm = 0.71611,0.71611,0.71611                \n"
-    "deg_ncdm = 1,1,1                      \n"
+    "T_ncdm = ");
+    if(M_nu!=0)
+    {
+      fprintf(out,"0.71611");
+      for(i=1;i<N_nu;i++) fprintf(out,", 0.71611");
+    }
+    fprintf(out,"\n");
+    if(M_nu!=0)
+    {
+      printf("deg_ncdm = 1");
+      for(i=1;i<N_nu;i++) fprintf(out,", 1");
+    }
+    fprintf(out,"\n");
+
+    fprintf(out,
     "Omega_k = 0.                      \n"
     "#Omega_Lambda = 0.7                     \n"
     "                        \n"
@@ -452,12 +477,6 @@ void create_boltzmann_ini_file (char dir_chain[])
     "P_k_max_h/Mpc = %.1lf                     \n"
     "z_pk = ",
     //H0,OB,Nur,OC,MNU/3.,MNU/3.,MNU/3.,tau,AS,NS,Z
-    h*100.,
-    OB0,
-    Nur,
-    OC0,
-    N_nu,
-    M_nu/3,M_nu/3,M_nu/3,
     tau_reio,
     As,
     ns,
@@ -509,16 +528,16 @@ void create_boltzmann_ini_file (char dir_chain[])
     "write parameters = no                           \n"
     "write warnings =                    \n"
     "                        \n"
-    "input_verbose = 0                     \n"
-    "background_verbose = 0                    \n"
-    "thermodynamics_verbose = 0                  \n"
-    "perturbations_verbose = 0                   \n"
-    "transfer_verbose = 0                    \n"
-    "primordial_verbose = 0                    \n"
-    "spectra_verbose = 0                     \n"
-    "nonlinear_verbose = 0                     \n"
-    "lensing_verbose = 0                     \n"
-    "output_verbose = 0                    \n");
+    "input_verbose = 1                     \n"
+    "background_verbose = 1                    \n"
+    "thermodynamics_verbose = 1                  \n"
+    "perturbations_verbose = 1                   \n"
+    "transfer_verbose = 1                    \n"
+    "primordial_verbose = 1                    \n"
+    "spectra_verbose = 1                     \n"
+    "nonlinear_verbose = 1                     \n"
+    "lensing_verbose = 1                     \n"
+    "output_verbose = 1                    \n");
     fclose(out);
   }
 }

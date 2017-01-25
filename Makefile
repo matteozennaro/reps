@@ -42,4 +42,4 @@ debug: all
 clean:
 	rm -rf $(SOURCE)/*.o
 	rm -rf $(MODULES)/*.o
-	rm reps
+	rm -f reps
