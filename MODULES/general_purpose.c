@@ -43,7 +43,7 @@ double ** allocate_matrix(int rows, int columns)
   for(i=0; i<rows; i++)
   {
     m[i] = malloc(columns*sizeof(double));
-    if (m==NULL)
+    if (m[i]==NULL)
     {
       frame("Bad memory allocation!\n");
       exit(-1);
