@@ -81,8 +81,12 @@ void BC()
   printf("distributed around z=%lf...\n",z_initial);
 
   char command[200];
-  sprintf(command,"%s%s %s/BOUNDARY_CONDITIONS_MODULE/tabs/power.ini > boltzmann.log",
-                  boltzmann_folder,boltzmann_code,dir_chain);
+  if ((strcmp(boltzmann_code,"class")==0) && (strcmp(class_precision_file,"none")!=0))
+    sprintf(command,"%s%s %s/BOUNDARY_CONDITIONS_MODULE/tabs/power.ini %s > boltzmann.log",
+                    boltzmann_folder,boltzmann_code,dir_chain,class_precision_file);
+  else
+    sprintf(command,"%s%s %s/BOUNDARY_CONDITIONS_MODULE/tabs/power.ini > boltzmann.log",
+                    boltzmann_folder,boltzmann_code,dir_chain);
   system(command);
 
   char powfile[200];
@@ -141,8 +145,12 @@ void BC()
 
   printf("Calling %s for computing beta at z=%lf...\n",boltzmann_code,z_initial);
 
-  sprintf(command,"%s%s %s/BOUNDARY_CONDITIONS_MODULE/tabs/power.ini > boltzmann.log",
-                  boltzmann_folder,boltzmann_code,dir_chain);
+  if((strcmp(boltzmann_code,"class")==0) && (strcmp(class_precision_file,"none")!=0))
+    sprintf(command,"%s%s %s/BOUNDARY_CONDITIONS_MODULE/tabs/power.ini %s > boltzmann.log",
+                    boltzmann_folder,boltzmann_code,dir_chain,class_precision_file);
+  else
+    sprintf(command,"%s%s %s/BOUNDARY_CONDITIONS_MODULE/tabs/power.ini > boltzmann.log",
+                    boltzmann_folder,boltzmann_code,dir_chain);
   system(command);
 
   double PPb[knum],PPc[knum],PPn[knum];

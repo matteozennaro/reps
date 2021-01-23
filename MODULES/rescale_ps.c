@@ -171,14 +171,20 @@ void rescale_class_ps(int knum, double *k)
   printf("\nCalling class and generating the P(K) and T(k) at the \n"
          "requested output redshifts.\n");
   char command[200];
-  sprintf(command,"%sclass %s/PK_TABS/power.ini > boltzmann.log",boltzmann_folder,dir_chain);
+  if (strcmp(class_precision_file,"none")==0)
+    sprintf(command, "%sclass %s/PK_TABS/power.ini > boltzmann.log", boltzmann_folder, dir_chain);
+  else
+    sprintf(command, "%sclass %s/PK_TABS/power.ini %s > boltzmann.log", boltzmann_folder, dir_chain, class_precision_file);
   system(command);
 
   // power spectra at z=0,99 used for normalization
   mode = 3;
   create_boltzmann_ini_file(dir_chain);
 
-  sprintf(command,"%sclass %s/PK_TABS/power_norm.ini > boltzmann.log",boltzmann_folder,dir_chain);
+  if (strcmp(class_precision_file,"none")==0)
+    sprintf(command, "%sclass %s/PK_TABS/power_norm.ini > boltzmann.log", boltzmann_folder, dir_chain);
+  else
+    sprintf(command, "%sclass %s/PK_TABS/power_norm.ini %s > boltzmann.log", boltzmann_folder, dir_chain, class_precision_file);
   system(command);
   mode = 0;
 
