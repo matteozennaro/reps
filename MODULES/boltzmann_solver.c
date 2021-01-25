@@ -329,215 +329,253 @@ void create_boltzmann_ini_file (char dir_chain[])
       }
     }
 
-    fprintf(out,
-    "H0 = %.8lf                      \n"
-    "T_cmb = 2.7255                      \n"
-    "Omega_b = %.8lf                     \n"
-    "N_ur = %.8lf                      \n"
-    "Omega_cdm = %.8lf                     \n"
-    "Omega_dcdmdr = 0.0                    \n"
-    "Gamma_dcdm = 0.0                    \n"
-    "N_ncdm = %lf                      \n",
-    h*100.,
-    OB0,
-    Nur,
-    OC0,
-    N_nu);
-
-    fprintf(out,
-    "m_ncdm = %lf",M_nu/N_nu);
-    for(i=1;i<N_nu;i++) fprintf(out,", %lf",M_nu/N_nu);
-    fprintf(out,"\n");
-
-    fprintf(out,
-    "Omega_ncdm =                        \n"
-    "T_ncdm = ");
-    if(M_nu!=0)
+    if (strcmp(class_base_par_file,"none")==0)
     {
-      fprintf(out,"0.71611");
-      for(i=1;i<N_nu;i++) fprintf(out,", 0.71611");
-    }
-    fprintf(out,"\n");
-    if(M_nu!=0)
-    {
-      printf("deg_ncdm = 1");
-      for(i=1;i<N_nu;i++) fprintf(out,", 1");
-    }
-    fprintf(out,"\n");
+      fprintf(out,
+              "H0 = %.8lf                      \n"
+              "T_cmb = 2.7255                      \n"
+              "Omega_b = %.8lf                     \n"
+              "N_ur = %.8lf                      \n"
+              "Omega_cdm = %.8lf                     \n"
+              "Omega_dcdmdr = 0.0                    \n"
+              "Gamma_dcdm = 0.0                    \n"
+              "N_ncdm = %lf                      \n",
+              h * 100.,
+              OB0,
+              Nur,
+              OC0,
+              N_nu);
 
-    fprintf(out,
-    "Omega_k = 0.                      \n"
-    "#Omega_Lambda = 0.7                     \n"
-    "                        \n"
-    "attractor_ic_scf = yes                    \n"
-    "#scf_parameters = [scf_lambda, scf_alpha, scf_A, scf_B, phi, phi_prime]       \n"
-    "scf_parameters = 10.0, 0.0, 0.0, 0.0, 100.0, 0.0            \n"
-    "scf_tuning_index = 0                    \n"
-    "                        \n"
-    "YHe = BBN                       \n"
-    "recombination = RECFAST                   \n"
-    "reio_parametrization = reio_camb                \n"
-    "tau_reio = %.8lf                    \n"
-    "reionization_exponent = 1.5                   \n"
-    "reionization_width = 0.5                  \n"
-    "helium_fullreio_redshift = 3.5                  \n"
-    "helium_fullreio_width = 0.5                   \n"
-    "binned_reio_num = 3                     \n"
-    "binned_reio_z = 8,12,16                   \n"
-    "binned_reio_xe = 0.8,0.2,0.1                  \n"
-    "binned_reio_step_sharpness = 0.3                \n"
-    "annihilation = 0.                     \n"
-    "annihilation_variation = 0.                   \n"
-    "annihilation_z = 1000                     \n"
-    "annihilation_zmax = 2500                  \n"
-    "annihilation_zmin = 30                    \n"
-    "annihilation_f_halo= 20                   \n"
-    "annihilation_z_halo= 8                    \n"
-    "on the spot = yes                     \n"
-    "decay = 0.                      \n"
-    "                        \n"
-    "output = mPk,mTk                    \n"
-    "                        \n"
-    "non linear =                        \n"
-    "                        \n"
-    "modes = s                       \n"
-    "                        \n"
-    "lensing = no                      \n"
-    "                        \n"
-    "ic = ad                       \n"
-    "gauge = synchronous                     \n"
-    "                        \n"
-    "P_k_ini type = analytic_Pk                  \n"
-    "k_pivot = 0.05                      \n"
-    "A_s = %.8e                          \n"
-    "n_s = %.8lf                       \n"
-    "alpha_s = 0.                      \n"
-    "                        \n"
-    "f_bi = 1.                       \n"
-    "n_bi = 1.5                      \n"
-    "f_cdi=1.                      \n"
-    "f_nid=1.                      \n"
-    "n_nid=2.                      \n"
-    "alpha_nid= 0.01                     \n"
-    "                        \n"
-    "c_ad_bi = 0.5                       \n"
-    "c_ad_cdi = -1.                      \n"
-    "c_bi_nid = 1.                       \n"
-    "                        \n"
-    "r = 1.                        \n"
-    "n_t = scc                       \n"
-    "alpha_t = scc                       \n"
-    "                        \n"
-    "potential = polynomial                    \n"
-    "V_0=1.e-13                      \n"
-    "V_1=-1.e-14                       \n"
-    "V_2=7.e-14                      \n"
-    "V_3=                        \n"
-    "V_4=                        \n"
-    "                        \n"
-    "H_0=1.e-13                      \n"
-    "H_1=-1.e-14                       \n"
-    "H_2=7.e-14                      \n"
-    "H_3=                        \n"
-    "H_4=                        \n"
-    "                        \n"
-    "phi_end =                       \n"
-    "Vparam0 =                       \n"
-    "Vparam1 =                       \n"
-    "Vparam2 =                       \n"
-    "Vparam3 =                       \n"
-    "Vparam4 =                       \n"
-    "ln_aH_ratio = 50                    \n"
-    "                        \n"
-    "k1=0.002                      \n"
-    "k2=0.1                        \n"
-    "                        \n"
-    "P_{RR}^1 = 2.3e-9                     \n"
-    "P_{RR}^2 = 2.3e-9                     \n"
-    "P_{II}^1 = 1.e-11                     \n"
-    "P_{II}^2 = 1.e-11                     \n"
-    "P_{RI}^1 = -1.e-13                    \n"
-    "|P_{RI}^2| = 1.e-13                     \n"
-    "                        \n"
-    "special_iso =                       \n"
-    "                        \n"
-    "command = cat external_Pk/Pk_example.dat              \n"
-    "                        \n"
-    "custom1 = 0.05     # In the example command: k_pivot            \n"
-    "custom2 = 2.215e-9 # In the example command: A_s            \n"
-    "custom3 = 0.9624   # In the example command: n_s            \n"
-    "custom4 = 2e-10    # In the example (with tensors) command: A_t         \n"
-    "custom5 = -0.1     # In the example (with tensors) command: n_t         \n"
-    "#custom6 = 0                      \n"
-    "#custom7 = 0                      \n"
-    "#custom8 = 0                      \n"
-    "#custom9 = 0                      \n"
-    "#custom10 = 0                       \n"
-    "                        \n"
-    "P_k_max_h/Mpc = %.1lf                     \n"
-    "z_pk = ",
-    //H0,OB,Nur,OC,MNU/3.,MNU/3.,MNU/3.,tau,AS,NS,Z
-    tau_reio,
-    As,
-    ns,
-    kmax);
+      fprintf(out,
+      "m_ncdm = %lf",M_nu/N_nu);
+      for(i=1;i<N_nu;i++) fprintf(out,", %lf",M_nu/N_nu);
+      fprintf(out,"\n");
 
-    if (mode==0)
-    {
-      for(i=0; i<(output_number-1); i++) fprintf(out,"%.4lf,",z_output[i]);
-      i = output_number-1; fprintf(out,"%.4lf\n",z_output[i]);
-    }
-    if (mode==1)
-    {
-      for(i=0;i<49;i++) fprintf(out,"%.4lf,",bc_zz[i]);
-      fprintf(out,"%.4lf\n",bc_zz[49]);
-    }
-    if (mode==2)
-    {
-      fprintf(out,"%.4lf\n",z_initial);
-    }
-    if (mode==3)
-    {
-      fprintf(out,"%.4lf, %.4lf\n",0.,z_initial);
-    }
+      fprintf(out,
+      "Omega_ncdm =                        \n"
+      "T_ncdm = ");
+      if(M_nu!=0)
+      {
+        fprintf(out,"0.71611");
+        for(i=1;i<N_nu;i++) fprintf(out,", 0.71611");
+      }
+      fprintf(out,"\n");
+      if(M_nu!=0)
+      {
+        printf("deg_ncdm = 1");
+        for(i=1;i<N_nu;i++) fprintf(out,", 1");
+      }
+      fprintf(out,"\n");
 
-    fprintf(out,
-    "                        \n"
-    "selection=gaussian                    \n"
-    "selection_mean = 0.98,0.99,1.0,1.1,1.2                \n"
-    "selection_width = 0.1                     \n"
-    "non_diagonal=4                      \n"
-    "                        \n"
-    "dNdz_selection =                    \n"
-    "dNdz_evolution =                    \n"
-    "bias = 1.                       \n"
-    "                        \n");
+      fprintf(out,
+      "Omega_k = 0.                      \n"
+      "#Omega_Lambda = 0.7                     \n"
+      "                        \n"
+      "attractor_ic_scf = yes                    \n"
+      "#scf_parameters = [scf_lambda, scf_alpha, scf_A, scf_B, phi, phi_prime]       \n"
+      "scf_parameters = 10.0, 0.0, 0.0, 0.0, 100.0, 0.0            \n"
+      "scf_tuning_index = 0                    \n"
+      "                        \n"
+      "YHe = BBN                       \n"
+      "recombination = RECFAST                   \n"
+      "reio_parametrization = reio_camb                \n"
+      "tau_reio = %.8lf                    \n"
+      "reionization_exponent = 1.5                   \n"
+      "reionization_width = 0.5                  \n"
+      "helium_fullreio_redshift = 3.5                  \n"
+      "helium_fullreio_width = 0.5                   \n"
+      "binned_reio_num = 3                     \n"
+      "binned_reio_z = 8,12,16                   \n"
+      "binned_reio_xe = 0.8,0.2,0.1                  \n"
+      "binned_reio_step_sharpness = 0.3                \n"
+      "annihilation = 0.                     \n"
+      "annihilation_variation = 0.                   \n"
+      "annihilation_z = 1000                     \n"
+      "annihilation_zmax = 2500                  \n"
+      "annihilation_zmin = 30                    \n"
+      "annihilation_f_halo= 20                   \n"
+      "annihilation_z_halo= 8                    \n"
+      "on the spot = yes                     \n"
+      "decay = 0.                      \n"
+      "                        \n"
+      "output = mPk,mTk                    \n"
+      "                        \n"
+      "non linear =                        \n"
+      "                        \n"
+      "modes = s                       \n"
+      "                        \n"
+      "lensing = no                      \n"
+      "                        \n"
+      "ic = ad                       \n"
+      "gauge = synchronous                     \n"
+      "                        \n"
+      "P_k_ini type = analytic_Pk                  \n"
+      "k_pivot = 0.05                      \n"
+      "A_s = %.8e                          \n"
+      "n_s = %.8lf                       \n"
+      "alpha_s = 0.                      \n"
+      "                        \n"
+      "f_bi = 1.                       \n"
+      "n_bi = 1.5                      \n"
+      "f_cdi=1.                      \n"
+      "f_nid=1.                      \n"
+      "n_nid=2.                      \n"
+      "alpha_nid= 0.01                     \n"
+      "                        \n"
+      "c_ad_bi = 0.5                       \n"
+      "c_ad_cdi = -1.                      \n"
+      "c_bi_nid = 1.                       \n"
+      "                        \n"
+      "r = 1.                        \n"
+      "n_t = scc                       \n"
+      "alpha_t = scc                       \n"
+      "                        \n"
+      "potential = polynomial                    \n"
+      "V_0=1.e-13                      \n"
+      "V_1=-1.e-14                       \n"
+      "V_2=7.e-14                      \n"
+      "V_3=                        \n"
+      "V_4=                        \n"
+      "                        \n"
+      "H_0=1.e-13                      \n"
+      "H_1=-1.e-14                       \n"
+      "H_2=7.e-14                      \n"
+      "H_3=                        \n"
+      "H_4=                        \n"
+      "                        \n"
+      "phi_end =                       \n"
+      "Vparam0 =                       \n"
+      "Vparam1 =                       \n"
+      "Vparam2 =                       \n"
+      "Vparam3 =                       \n"
+      "Vparam4 =                       \n"
+      "ln_aH_ratio = 50                    \n"
+      "                        \n"
+      "k1=0.002                      \n"
+      "k2=0.1                        \n"
+      "                        \n"
+      "P_{RR}^1 = 2.3e-9                     \n"
+      "P_{RR}^2 = 2.3e-9                     \n"
+      "P_{II}^1 = 1.e-11                     \n"
+      "P_{II}^2 = 1.e-11                     \n"
+      "P_{RI}^1 = -1.e-13                    \n"
+      "|P_{RI}^2| = 1.e-13                     \n"
+      "                        \n"
+      "special_iso =                       \n"
+      "                        \n"
+      "command = cat external_Pk/Pk_example.dat              \n"
+      "                        \n"
+      "custom1 = 0.05     # In the example command: k_pivot            \n"
+      "custom2 = 2.215e-9 # In the example command: A_s            \n"
+      "custom3 = 0.9624   # In the example command: n_s            \n"
+      "custom4 = 2e-10    # In the example (with tensors) command: A_t         \n"
+      "custom5 = -0.1     # In the example (with tensors) command: n_t         \n"
+      "#custom6 = 0                      \n"
+      "#custom7 = 0                      \n"
+      "#custom8 = 0                      \n"
+      "#custom9 = 0                      \n"
+      "#custom10 = 0                       \n"
+      "                        \n"
+      "P_k_max_h/Mpc = %.1lf                     \n"
+      "z_pk = ",
+      //H0,OB,Nur,OC,MNU/3.,MNU/3.,MNU/3.,tau,AS,NS,Z
+      tau_reio,
+      As,
+      ns,
+      kmax);
 
-    if (mode==0) fprintf(out,"root = %s/PK_TABS/power_\n",dir_chain);
-    if (mode==1) fprintf(out,"root = %s/BOUNDARY_CONDITIONS_MODULE/tabs/power_\n",dir_chain);
-    if (mode==2) fprintf(out,"root = %s/BOUNDARY_CONDITIONS_MODULE/tabs/power_zin_\n",dir_chain);
-    if (mode==3) fprintf(out,"root = %s/PK_TABS/power_norm_\n",dir_chain);
+      if (mode==0)
+      {
+        for(i=0; i<(output_number-1); i++) fprintf(out,"%.4lf,",z_output[i]);
+        i = output_number-1; fprintf(out,"%.4lf\n",z_output[i]);
+      }
+      if (mode==1)
+      {
+        for(i=0;i<49;i++) fprintf(out,"%.4lf,",bc_zz[i]);
+        fprintf(out,"%.4lf\n",bc_zz[49]);
+      }
+      if (mode==2)
+      {
+        fprintf(out,"%.4lf\n",z_initial);
+      }
+      if (mode==3)
+      {
+        fprintf(out,"%.4lf, %.4lf\n",0.,z_initial);
+      }
 
-    fprintf(out,
-    "headers = no                      \n"
-    "format = class                      \n"
-    "                        \n"
-    "write background = no                     \n"
-    "write thermodynamics = no                   \n"
-    "write primordial = no                     \n"
-    "write parameters = no                           \n"
-    "write warnings =                    \n"
-    "                        \n"
-    "input_verbose = 1                     \n"
-    "background_verbose = 1                    \n"
-    "thermodynamics_verbose = 1                  \n"
-    "perturbations_verbose = 1                   \n"
-    "transfer_verbose = 1                    \n"
-    "primordial_verbose = 1                    \n"
-    "spectra_verbose = 1                     \n"
-    "nonlinear_verbose = 1                     \n"
-    "lensing_verbose = 1                     \n"
-    "output_verbose = 1                    \n");
-    fclose(out);
+      fprintf(out,
+      "                        \n"
+      "selection=gaussian                    \n"
+      "selection_mean = 0.98,0.99,1.0,1.1,1.2                \n"
+      "selection_width = 0.1                     \n"
+      "non_diagonal=4                      \n"
+      "                        \n"
+      "dNdz_selection =                    \n"
+      "dNdz_evolution =                    \n"
+      "bias = 1.                       \n"
+      "                        \n");
+
+      if (mode==0) fprintf(out,"root = %s/PK_TABS/power_\n",dir_chain);
+      if (mode==1) fprintf(out,"root = %s/BOUNDARY_CONDITIONS_MODULE/tabs/power_\n",dir_chain);
+      if (mode==2) fprintf(out,"root = %s/BOUNDARY_CONDITIONS_MODULE/tabs/power_zin_\n",dir_chain);
+      if (mode==3) fprintf(out,"root = %s/PK_TABS/power_norm_\n",dir_chain);
+
+      fprintf(out,
+      "headers = no                      \n"
+      "format = class                      \n"
+      "                        \n"
+      "write background = no                     \n"
+      "write thermodynamics = no                   \n"
+      "write primordial = no                     \n"
+      "write parameters = no                           \n"
+      "write warnings =                    \n"
+      "                        \n"
+      "input_verbose = 1                     \n"
+      "background_verbose = 1                    \n"
+      "thermodynamics_verbose = 1                  \n"
+      "perturbations_verbose = 1                   \n"
+      "transfer_verbose = 1                    \n"
+      "primordial_verbose = 1                    \n"
+      "spectra_verbose = 1                     \n"
+      "nonlinear_verbose = 1                     \n"
+      "lensing_verbose = 1                     \n"
+      "output_verbose = 1                    \n");
+      fclose(out);
+    }
+    else
+    {
+      fprintf(out, "headers = no                      \n"
+                   "format = class                      \n"
+                   "output = mPk,mTk                    \n"
+                   "P_k_max_h/Mpc = %.1lf                     \n"
+                   "z_pk = ",
+              kmax);
+      if (mode==0)
+      {
+        for(i=0; i<(output_number-1); i++) fprintf(out,"%.4lf,",z_output[i]);
+        i = output_number-1; fprintf(out,"%.4lf\n",z_output[i]);
+      }
+      if (mode==1)
+      {
+        for(i=0;i<49;i++) fprintf(out,"%.4lf,",bc_zz[i]);
+        fprintf(out,"%.4lf\n",bc_zz[49]);
+      }
+      if (mode==2)
+      {
+        fprintf(out,"%.4lf\n",z_initial);
+      }
+      if (mode==3)
+      {
+        fprintf(out,"%.4lf, %.4lf\n",0.,z_initial);
+      }
+      if (mode==0) fprintf(out,"root = %s/PK_TABS/power_\n",dir_chain);
+      if (mode==1) fprintf(out,"root = %s/BOUNDARY_CONDITIONS_MODULE/tabs/power_\n",dir_chain);
+      if (mode==2) fprintf(out,"root = %s/BOUNDARY_CONDITIONS_MODULE/tabs/power_zin_\n",dir_chain);
+      if (mode==3) fprintf(out,"root = %s/PK_TABS/power_norm_\n",dir_chain);
+      fclose(out);
+      char buf[1024];
+      sprintf(buf, "cat %s >> %s", class_base_par_file, fileopen);
+      system(buf);
+    }
   }
 }

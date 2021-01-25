@@ -6,6 +6,7 @@ extern char boltzmann_code[200];
 extern char boltzmann_folder[500];
 extern char neutrino_tab_file[200];
 extern char class_precision_file[500];
+extern char class_base_par_file[500];
 extern int wrong_ic;
 extern int wrong_nu;
 extern char print_hubble;

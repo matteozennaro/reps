@@ -354,6 +354,8 @@ void read_parameter_file(char parfile[])
     sprintf(neutrino_tab_file,"%s","tabulated_functions/FF_GG_func_tab.dat");
   if(read_string_from_file(parfile,"class_precision_file",class_precision_file)!=1)
     sprintf(class_precision_file,"%s","none");
+  if(read_string_from_file(parfile,"class_base_par_file",class_base_par_file)!=1)
+    sprintf(class_base_par_file,"%s","none");
 
   if(read_int_from_file(parfile,"k_per_logint_camb",&k_per_logint_camb)!=1)
   k_per_logint_camb = 10;

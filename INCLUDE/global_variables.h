@@ -9,6 +9,7 @@ char boltzmann_code[200];
 char boltzmann_folder[500];
 int k_per_logint_camb;
 char class_precision_file[500];
+char class_base_par_file[500];
 
 int wrong_nu = 0;
 int wrong_ic = 0;
