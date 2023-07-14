@@ -114,17 +114,17 @@ void create_boltzmann_ini_file (char dir_chain[])
     "												     \n"
     "#Main cosmological parameters, neutrino masses are assumed degenerate\n"
     "# If use_phyical set phyiscal densities in baryone, CDM and neutrinos + Omega_k\n"
-    "use_physical	= F\n"
+    "use_physical	= T\n"
     "												     \n"
     "omk= 0.0\n"
     "hubble= %lf\n"
     "w= %lf\n"
     "wa = %lf\n"
     "cs2_lam= 1\n"
-    "omega_baryon= %.10lf\n"
-    "omega_cdm= %.10lf\n"
+    "ombh2= %.10lf\n"
+    "omch2= %.10lf\n"
     "omega_lambda= %.10lf\n"
-    "omega_neutrino = %.10lf\n"
+    "omnuh2 = %.10lf\n"
     "												     \n"
     "temp_cmb= 2.7255\n"
     "helium_fraction= 0.24\n"
@@ -208,10 +208,10 @@ void create_boltzmann_ini_file (char dir_chain[])
     h*100.0,
     w0,
     wa,
-    OB0,
-    OC0,
+    OB0*h*h,
+    OC0*h*h,
     1.0-OB0-OC0-ONE2(1.0),
-    ONE2(1.),
+    ONE2(1.)*h*h,
     Nur,
     (int)round(N_nu),
     (int)round(N_eigenstates),
